@@ -1,37 +1,34 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import '../../../imports/imports.dart';
 
 import '../application/counter_controller.dart';
 
 class CounterPage extends StatelessWidget {
-const CounterPage({super.key});
+  const CounterPage({super.key});
 
-@override
-Widget build(BuildContext context) {
-return ChangeNotifierProvider(
-create: (_) => CounterController(),
-child: Consumer<CounterController>(
-    builder: (context, controller, _) {
-    return Scaffold(
-    appBar: AppBar(title: const Text('Counter (Provider)')),
-    body: Center(
-    child: Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-    Text('Provider counter',
-    style: context.textTheme.titleMedium),
-    Text('${controller.count}',
-    style: context.textTheme.displayMedium),
-    ],
-    ),
-    ),
-    floatingActionButton: FloatingActionButton(
-    onPressed: controller.increment,
-    child: const Icon(Icons.add),
-    ),
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => CounterController(),
+      child: Consumer<CounterController>(
+        builder: (context, controller, _) {
+          return Scaffold(
+            appBar: AppBar(title: const Text('Counter (Provider)')),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Provider counter', style: context.textTheme.titleMedium),
+                  Text('${controller.count}', style: context.textTheme.displayMedium),
+                ],
+              ),
+            ),
+            floatingActionButton: FloatingActionButton(
+              onPressed: controller.increment,
+              child: const Icon(Icons.add),
+            ),
+          );
+        },
+      ),
     );
-    },
-    ),
-    );
-    }
-    }
+  }
+}

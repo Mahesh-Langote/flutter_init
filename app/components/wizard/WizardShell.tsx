@@ -19,7 +19,7 @@ const steps: Record<
     },
     theme: {
         title: "UI & theme",
-        description: "Choose theming, fonts, and dark mode.",
+        description: "Choose theming, primary color, and dark mode.",
     },
     architecture: {
         title: "Architecture",
@@ -37,13 +37,17 @@ const steps: Record<
         title: "Backend & Auth",
         description: "Configure backend integrations and auth.",
     },
+    localization: {
+        title: "Localization",
+        description: "Setup easily with easy_localization.",
+    },
     packages: {
         title: "Common Packages",
         description: "Select networking and utilities.",
     },
     extras: {
         title: "Extras",
-        description: "Add polish like i18n, splash, and flavors.",
+        description: "Add polish like splash screens, and flavors.",
     },
     generate: {
         title: "Generate",

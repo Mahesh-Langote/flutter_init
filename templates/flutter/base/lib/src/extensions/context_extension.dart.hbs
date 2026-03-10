@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-{{#if (eq flags.routerPackage "go_router")}}import 'package:go_router/go_router.dart';{{/if}}
+{{#if (eq flags.routerPackage "go_router")}}
+import 'package:go_router/go_router.dart';
+{{/if}}
 
 import '../theme/color_schemes.dart';
 import '../theme/theme.dart';
+import '../shared/enums/snack_bar_type.dart';
 
 extension ContextExtension on BuildContext {
   // ── Theme shortcuts ──────────────────────────────────────────────────────
@@ -94,6 +97,33 @@ extension ContextExtension on BuildContext {
       context: this,
       builder: builder,
     );
+  }
+
+  /// Shows a snackbar with a colour driven by [SnackBarType].
+  ///
+  /// ```dart
+  /// context.showTypedSnackBar('Saved!', type: SnackBarType.success);
+  /// ```
+  void showTypedSnackBar(
+    String message, {
+    SnackBarType type = SnackBarType.info,
+    Duration duration = const Duration(seconds: 3),
+  }) {
+    final bg = switch (type) {
+      SnackBarType.success => appColors.success,
+      SnackBarType.warning => appColors.warning,
+      SnackBarType.error   => colors.error,
+      SnackBarType.info    => colors.inverseSurface,
+    };
+    ScaffoldMessenger.of(this)
+      ..clearSnackBars()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: bg,
+          duration: duration,
+        ),
+      );
   }
 
   // ── Routing shortcuts ────────────────────────────────────────────────────

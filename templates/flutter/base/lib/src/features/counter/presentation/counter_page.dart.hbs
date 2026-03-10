@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
-{{#if flags.usesScreenutil}}import 'package:flutter_screenutil/flutter_screenutil.dart';{{/if}}
-{{#if flags.usesAnimate}}import 'package:flutter_animate/flutter_animate.dart';{{/if}}
+import '../../../imports/imports.dart';
 
 class CounterPage extends StatefulWidget {
   const CounterPage({super.key});
@@ -27,7 +25,7 @@ class _CounterPageState extends State<CounterPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'You have pushed the button this many times:',
+              {{#if flags.supportsLocalization}}'counterLabel'.tr(){{else}}'You have pushed the button this many times:'{{/if}},
               style: context.textTheme.titleMedium{{#if flags.usesScreenutil}}?.copyWith(fontSize: 14.sp){{/if}},
             ),
             Text(

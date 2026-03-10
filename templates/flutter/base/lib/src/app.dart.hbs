@@ -1,8 +1,7 @@
 import 'imports/imports.dart';
-import 'features/counter/presentation/counter_page.dart';
 
 class App extends StatelessWidget {
-const App({super.key});
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,12 +35,9 @@ const App({super.key});
       onGenerateRoute: AppRouter.onGenerateRoute,
       {{/if}}
       {{#if flags.supportsLocalization}}
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       {{/if}}
     );
   }

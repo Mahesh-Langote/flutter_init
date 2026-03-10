@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-{{#if flags.usesGoogleFont}}
-import 'package:google_fonts/google_fonts.dart';
-{{/if}}
 
 /// Defines the full Material 3 typescale for the application.
 ///
@@ -161,14 +158,5 @@ TextTheme buildTextTheme() {
     ),
   );
 
-  {{#if flags.usesGoogleFont}}
-  // Apply the selected Google Font while preserving the M3 size and spacing
-  // values defined above (sizes/weights are not overridden by getTextTheme).
-  return GoogleFonts.getTextTheme(
-    '{{#if theme.font.family}}{{theme.font.family}}{{else}}Roboto{{/if}}',
-    baseTextTheme,
-  );
-  {{else}}
   return baseTextTheme;
-  {{/if}}
 }

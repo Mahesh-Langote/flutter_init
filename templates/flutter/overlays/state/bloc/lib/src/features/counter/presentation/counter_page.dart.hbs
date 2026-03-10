@@ -1,41 +1,38 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../imports/imports.dart';
 
 import '../application/counter_cubit.dart';
 
 class CounterPage extends StatelessWidget {
-const CounterPage({super.key});
+  const CounterPage({super.key});
 
-@override
-Widget build(BuildContext context) {
-return BlocProvider(
-create: (_) => CounterCubit(),
-child: Scaffold(
-appBar: AppBar(title: const Text('Counter (Bloc)')),
-body: Center(
-child: BlocBuilder<CounterCubit, int>(
-    builder: (context, count) {
-    return Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-    Text('Bloc counter',
-    style: context.textTheme.titleMedium),
-    Text('$count',
-    style: context.textTheme.displayMedium),
-    ],
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => CounterCubit(),
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Counter (Bloc)')),
+        body: Center(
+          child: BlocBuilder<CounterCubit, int>(
+            builder: (context, count) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Bloc counter', style: context.textTheme.titleMedium),
+                  Text('$count', style: context.textTheme.displayMedium),
+                ],
+              );
+            },
+          ),
+        ),
+        floatingActionButton: Builder(
+          builder: (context) {
+            return FloatingActionButton(
+              onPressed: () => context.read<CounterCubit>().increment(),
+              child: const Icon(Icons.add),
+            );
+          },
+        ),
+      ),
     );
-    },
-    ),
-    ),
-    floatingActionButton: Builder(
-    builder: (context) {
-    return FloatingActionButton(
-    onPressed: () => context.read<CounterCubit>().increment(),
-        child: const Icon(Icons.add),
-        );
-        },
-        ),
-        ),
-        );
-        }
-        }
+  }
+}

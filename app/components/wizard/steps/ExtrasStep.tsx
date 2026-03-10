@@ -23,7 +23,7 @@ export function ExtrasStep() {
             <CardHeader>
                 <CardTitle className="bg-linear-to-br from-foreground to-muted-foreground bg-clip-text text-transparent text-xl font-bold">Extras</CardTitle>
                 <CardDescription>
-                    Add production touches like i18n, splash screens, and flavors.
+                    Add production touches like splash screens and flavors.
                 </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2">

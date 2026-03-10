@@ -4,6 +4,7 @@ import { BackendStep } from "./steps/BackendStep"
 import { BasicsStep } from "./steps/BasicsStep"
 import { ExtrasStep } from "./steps/ExtrasStep"
 import { GenerateStep } from "./steps/GenerateStep"
+import { LocalizationStep } from "./steps/LocalizationStep"
 import { NavigationStep } from "./steps/NavigationStep"
 import { PackagesStep } from "./steps/PackagesStep"
 import { StateStep } from "./steps/StateStep"
@@ -23,6 +24,8 @@ export function StepContent({ step }: { step: StepId }) {
             return <NavigationStep />
         case "backend":
             return <BackendStep />
+        case "localization":
+            return <LocalizationStep />
         case "packages":
             return <PackagesStep />
         case "extras":

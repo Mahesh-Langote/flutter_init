@@ -36,9 +36,11 @@ type TemplateContext = ScaffoldConfig & {
         usesDotenv: boolean
         usesLogger: boolean
         supportsLocalization: boolean
+        supportedLocales: string[]
+        fallbackLocale: string
         hasFlavors: boolean
         hasDarkMode: boolean
-        usesGoogleFont: boolean
+
     }
 }
 
@@ -58,6 +60,29 @@ export async function generateFlutterScaffold(input: unknown) {
 
     try {
         await composeLayers([baseDir, ...overlayDirs], workingDir, hbs, context)
+
+        if (context.flags.supportsLocalization) {
+            const translationsDir = path.join(workingDir, "assets", "translations")
+            await fs.mkdir(translationsDir, { recursive: true })
+
+            // We read the en.json.hbs template and use it to seed all configured locales
+            // In a real scenario, these would ideally hit an API to pre-translate or come out empty.
+            const baseTransPath = path.join(templatesRoot, "overlays", "extras", "localization", "assets", "translations", "en.json.hbs")
+            let templateContent = "{\n}"
+            try {
+                templateContent = await fs.readFile(baseTransPath, "utf8")
+            } catch (e) {
+                // fallback
+            }
+
+            const template = hbs.compile(templateContent)
+            const rendered = template(context)
+
+            for (const locale of context.flags.supportedLocales) {
+                await fs.writeFile(path.join(translationsDir, `${locale}.json`), rendered, "utf8")
+            }
+        }
+
         const zipBuffer = await zipDirectory(workingDir)
         return zipBuffer
     } finally {
@@ -104,10 +129,11 @@ function buildTemplateContext(config: ScaffoldConfig): TemplateContext {
             usesAnimate: config.commonPackages.flutterAnimate,
             usesDotenv: config.commonPackages.flutterDotenv,
             usesLogger: config.commonPackages.logger,
-            supportsLocalization: config.extras.localization,
+            supportsLocalization: config.localization.enabled,
+            supportedLocales: config.localization.supportedLocales.length > 0 ? config.localization.supportedLocales : ["en"],
+            fallbackLocale: config.localization.supportedLocales.length > 0 ? config.localization.supportedLocales[0] : "en",
             hasFlavors: config.extras.flavors,
             hasDarkMode: config.theme.darkMode.enabled,
-            usesGoogleFont: config.theme.font.choice === "google",
         },
     }
 }
@@ -131,10 +157,11 @@ async function resolveOverlayDirs(
         ],
         [path.join(root, "overlays", "networking", "dio"), config.commonPackages.dio],
         [path.join(root, "overlays", "networking", "http"), config.commonPackages.http],
-        [path.join(root, "overlays", "extras", "localization"), config.extras.localization],
+        [path.join(root, "overlays", "extras", "localization"), config.localization.enabled],
         [path.join(root, "overlays", "extras", "base_widgets"), config.extras.baseWidgets],
         [path.join(root, "overlays", "storage", "secure_storage"), config.commonPackages.flutterSecureStorage],
         [path.join(root, "overlays", "extras", "flavors"), config.extras.flavors],
+        [path.join(root, "overlays", "extras", "dotenv"), config.commonPackages.flutterDotenv],
     ]
 
     for (const [candidate, enabled] of candidates) {
@@ -191,10 +218,17 @@ async function copyAndRenderDirectory(
             await copyAndRenderDirectory(sourcePath, targetPath, hbs, context)
         } else if (entry.isFile()) {
             if (entry.name.endsWith(".hbs")) {
-                const templateContent = await fs.readFile(sourcePath, "utf8")
-                const template = hbs.compile(templateContent)
-                const rendered = template(context)
-                await fs.writeFile(targetPath, rendered, "utf8")
+                let templateContent = ""
+                try {
+                    templateContent = await fs.readFile(sourcePath, "utf8")
+                    const template = hbs.compile(templateContent)
+                    const rendered = template(context)
+                    await fs.writeFile(targetPath, rendered, "utf8")
+                } catch (e: any) {
+                    console.error("Template rendering failed for file:", sourcePath)
+                    console.error("Template content:", templateContent)
+                    throw e;
+                }
             } else {
                 const data = await fs.readFile(sourcePath)
                 await fs.mkdir(path.dirname(targetPath), { recursive: true })

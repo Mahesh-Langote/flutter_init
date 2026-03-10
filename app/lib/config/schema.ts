@@ -46,6 +46,7 @@ export type StepId =
     | "state"
     | "navigation"
     | "backend"
+    | "localization"
     | "packages"
     | "extras"
     | "generate"
@@ -57,16 +58,12 @@ export const stepOrder: StepId[] = [
     "state",
     "navigation",
     "backend",
+    "localization",
     "packages",
     "extras",
     "generate",
 ]
 
-const fontSchema = z.object({
-    choice: z.enum(["default", "google"]),
-    family: z.string().optional(),
-})
-export type FontChoice = z.infer<typeof fontSchema>
 
 const darkModeSchema = z.object({
     enabled: z.boolean(),
@@ -77,7 +74,6 @@ const themeSchema = z.object({
     preset: themePresetSchema,
     primaryColor: z.string().optional(),
     darkMode: darkModeSchema,
-    font: fontSchema,
 })
 export type ThemeConfig = z.infer<typeof themeSchema>
 
@@ -120,7 +116,6 @@ export type BackendConfig = z.infer<typeof backendSchema>
 const packagesSchema = z.object({
     dio: z.boolean(),
     http: z.boolean(),
-    intl: z.boolean(),
     hive: z.boolean(),
     sharedPreferences: z.boolean(),
     flutterSecureStorage: z.boolean(),
@@ -135,7 +130,6 @@ const packagesSchema = z.object({
 export type PackagesConfig = z.infer<typeof packagesSchema>
 
 const extrasSchema = z.object({
-    localization: z.boolean(),
     errorHandling: z.boolean(),
     loadingStates: z.boolean(),
     networkConnectivity: z.boolean(),
@@ -146,6 +140,12 @@ const extrasSchema = z.object({
 })
 export type ExtrasConfig = z.infer<typeof extrasSchema>
 
+const localizationSchema = z.object({
+    enabled: z.boolean(),
+    supportedLocales: z.array(z.string()).min(1),
+})
+export type LocalizationConfig = z.infer<typeof localizationSchema>
+
 export const scaffoldConfigSchema = z.object({
     appName: z.string().min(1, "App name is required"),
     packageId: z.string().min(1, "Package id is required"),
@@ -153,6 +153,7 @@ export const scaffoldConfigSchema = z.object({
     theme: themeSchema,
     stateManagement: stateManagementSchema,
     backend: backendSchema,
+    localization: localizationSchema,
     navigation: navigationSchema,
     commonPackages: packagesSchema,
     architecture: architectureSchema,
@@ -182,16 +183,15 @@ export const defaultConfig: ScaffoldConfig = {
         preset: "material3",
         primaryColor: "#6750A4",
         darkMode: { enabled: true, system: true },
-        font: { choice: "default", family: "Roboto" },
     },
     stateManagement: "riverpod",
     backend: { provider: "none" },
+    localization: { enabled: true, supportedLocales: ["en", "es"] },
     navigation: "go_router",
     commonPackages: {
         dio: true,
         http: false,
 
-        intl: true,
         hive: false,
         sharedPreferences: true,
         flutterSecureStorage: true,
@@ -205,7 +205,6 @@ export const defaultConfig: ScaffoldConfig = {
     },
     architecture: "feature-first",
     extras: {
-        localization: true,
         errorHandling: true,
         loadingStates: true,
         networkConnectivity: true,
@@ -292,7 +291,6 @@ export const packageOptions: Array<{
         { key: "dio", label: "dio", description: "Powerful HTTP client for Dart with Interceptors and Global configuration." },
         { key: "http", label: "http", description: "A composable, Future-based library for making HTTP requests." },
 
-        { key: "intl", label: "intl", description: "Internationalization and localization support." },
         { key: "hive", label: "hive", description: "Lightweight and blazing fast key-value database." },
         { key: "sharedPreferences", label: "shared_preferences", description: "Persistent storage for simple data." },
         { key: "flutterSecureStorage", label: "flutter_secure_storage", description: "Secure storage for sensitive data (Keychain/Keystore)." },
@@ -310,7 +308,6 @@ export const extrasOptions: Array<{
     label: string
     description?: string
 }> = [
-        { key: "localization", label: "Localization (i18n)" },
         { key: "errorHandling", label: "Error handling setup" },
         { key: "loadingStates", label: "Loading & empty states" },
         { key: "networkConnectivity", label: "Network connectivity checker" },
@@ -319,3 +316,16 @@ export const extrasOptions: Array<{
         { key: "appIcon", label: "App icon" },
         { key: "flavors", label: "Flavors (dev/staging/prod)" },
     ]
+
+export const localizationOptions = [
+    { value: "en", label: "English" },
+    { value: "es", label: "Spanish" },
+    { value: "fr", label: "French" },
+    { value: "de", label: "German" },
+    { value: "it", label: "Italian" },
+    { value: "pt", label: "Portuguese" },
+    { value: "ru", label: "Russian" },
+    { value: "zh", label: "Chinese" },
+    { value: "ja", label: "Japanese" },
+    { value: "ar", label: "Arabic" },
+] as const satisfies Array<{ value: string; label: string }>
