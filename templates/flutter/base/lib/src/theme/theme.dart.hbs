@@ -89,6 +89,7 @@ ThemeData _buildTheme(ColorScheme colorScheme, AppColorsExtension customColors) 
   
   return ThemeData(
     useMaterial3: true,
+    primaryColor: colorScheme.primary,
     colorScheme: colorScheme,
     textTheme: textTheme,
     extensions: [
@@ -236,7 +237,7 @@ ThemeData _buildTheme(ColorScheme colorScheme, AppColorsExtension customColors) 
 
     // Floating Action Button Theme
     floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: colorScheme.primaryContainer,
+      backgroundColor: colorScheme.primary,
       foregroundColor: colorScheme.onPrimaryContainer,
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
