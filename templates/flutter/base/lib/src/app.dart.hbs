@@ -31,7 +31,7 @@ class App extends StatelessWidget {
       {{#if flags.routerPackage}}
       routerConfig: {{#if (eq flags.routerPackage "go_router")}}appRouter{{else}}AppRouter().config(){{/if}},
       {{else}}
-      home: const CounterPage(),
+      home: const OnboardingPage(),
       onGenerateRoute: AppRouter.onGenerateRoute,
       {{/if}}
       {{#if flags.supportsLocalization}}

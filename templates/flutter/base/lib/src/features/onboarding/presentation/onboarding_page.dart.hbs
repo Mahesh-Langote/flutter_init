@@ -1,0 +1,164 @@
+{{#if (eq flags.routerPackage "auto_route")}}
+import 'package:auto_route/auto_route.dart';
+{{/if}}
+import '../../../imports/imports.dart';
+import '../../../shared/widgets/app_button.dart';
+import '../../../routing/app_routes.dart';
+
+{{#if (eq flags.routerPackage "auto_route")}}
+@RoutePage()
+{{/if}}
+class OnboardingPage extends HookWidget {
+  const OnboardingPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    final pageController = usePageController();
+    final currentIndex = useState(0);
+
+    final List<Map<String, dynamic>> onboardingData = useMemoized(() => [
+      {
+        'title': {{#if flags.supportsLocalization}}'onboarding.onboarding_title_1'.tr(){{else}}'Your Journey,\nPerfectly Planned'{{/if}},
+        'subtitle':
+            {{#if flags.supportsLocalization}}'onboarding.onboarding_subtitle_1'.tr(){{else}}'Effortlessly create and organize your\ndream trips. Start exploring now!'{{/if}},
+        'pageWidget': const FlutterLogo(size: 200),
+      },
+      {
+        'title': {{#if flags.supportsLocalization}}'onboarding.onboarding_title_2'.tr(){{else}}'Discover\nFriends Nearby'{{/if}},
+        'subtitle':
+            {{#if flags.supportsLocalization}}'onboarding.onboarding_subtitle_2'.tr(){{else}}'See where your friends are traveling and\nexplore the world together.'{{/if}},
+        'pageWidget': const FlutterLogo(size: 200),
+      },
+      {
+        'title': {{#if flags.supportsLocalization}}'onboarding.onboarding_title_3'.tr(){{else}}'Stay Updated\nwith Top Places'{{/if}},
+        'subtitle':
+            {{#if flags.supportsLocalization}}'onboarding.onboarding_subtitle_3'.tr(){{else}}'Find trending destinations and must-see attractions,\nall tailored to enhance your travel plans.'{{/if}},
+        'pageWidget': const FlutterLogo(size: 200),
+      },
+    ]);
+
+    void onGetStarted() {
+      // Navigate back or to home. For template purpose:
+      {{#if (eq flags.routerPackage "go_router")}}
+      context.go(AppRoutes.home);
+      {{else if (eq flags.routerPackage "auto_route")}}
+      ontext.replaceRoute(const HomeRoute());
+      {{else}}
+      Navigator.pushReplacementNamed(context, AppRoutes.home);
+      {{/if}}
+    }
+
+    return Scaffold(
+      backgroundColor: colorScheme.surface,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Top branding
+            Padding(
+              padding: {{#if flags.usesScreenutil}}EdgeInsets.only(top: AppSpacing.lg.h, bottom: AppSpacing.md.h){{else}}const EdgeInsets.only(top: AppSpacing.lg, bottom: AppSpacing.md){{/if}},
+              child: Text(
+                    'WanderWise.',
+                    style: textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: colorScheme.onSurface,
+                      {{#if flags.usesScreenutil}}fontSize: 22.sp,{{/if}}
+                    ),
+                  ),
+            ),
+
+            // PageView
+            Expanded(
+              child: PageView.builder(
+                controller: pageController,
+                itemCount: onboardingData.length,
+                onPageChanged: (index) {
+                  currentIndex.value = index;
+                },
+                itemBuilder: (context, index) {
+                  return Column(
+                    children: [
+                      // Dynamic Illustration Section
+                      Expanded(
+                        child: Center(
+                          child: Padding(
+                            padding: {{#if flags.usesScreenutil}}EdgeInsets.symmetric(horizontal: AppSpacing.lg.w){{else}}const EdgeInsets.symmetric(horizontal: AppSpacing.lg){{/if}},
+                            child: onboardingData[index]['pageWidget'] as Widget,
+                          ),
+                        ),
+                      ),
+                      
+                      // Text Section
+                      Padding(
+                        padding: {{#if flags.usesScreenutil}}EdgeInsets.symmetric(horizontal: AppSpacing.xl.w){{else}}const EdgeInsets.symmetric(horizontal: AppSpacing.xl){{/if}},
+                        child: Column(
+                          children: [
+                            Text(
+                              onboardingData[index]['title'] as String,
+                              textAlign: TextAlign.center,
+                              style: textTheme.headlineMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: colorScheme.onSurface,
+                                height: 1.2,
+                                {{#if flags.usesScreenutil}}fontSize: 24.sp,{{/if}}
+                              ),
+                            ),
+                            SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.md.h{{else}}AppSpacing.md{{/if}}),
+                            Text(
+                              onboardingData[index]['subtitle'] as String,
+                              textAlign: TextAlign.center,
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                                height: 1.5,
+                                {{#if flags.usesScreenutil}}fontSize: 14.sp,{{/if}}
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: {{#if flags.usesScreenutil}}40.h{{else}}40{{/if}}),
+                    ],
+                  );
+                },
+              ),
+            ),
+
+            // Bottom Section: Dots and Button
+            Padding(
+              padding: {{#if flags.usesScreenutil}}EdgeInsets.all(AppSpacing.xl.w){{else}}const EdgeInsets.all(AppSpacing.xl){{/if}},
+              child: Column(
+                children: [
+                  // Dot Indicators
+                  SmoothPageIndicator(
+                    controller: pageController,
+                    count: onboardingData.length,
+                    effect: ExpandingDotsEffect(
+                      activeDotColor: colorScheme.primary,
+                      dotColor: colorScheme.primary.withOpacity(0.2),
+                      dotHeight: {{#if flags.usesScreenutil}}8.h{{else}}8{{/if}},
+                      dotWidth: {{#if flags.usesScreenutil}}8.w{{else}}8{{/if}},
+                      spacing: {{#if flags.usesScreenutil}}8.w{{else}}8{{/if}},
+                    ),
+                  ),
+                  SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.xl.h{{else}}AppSpacing.xl{{/if}}),
+                  // Get Started Button
+                  AppButton(
+                    label: {{#if flags.supportsLocalization}}'shared.get_started'.tr(){{else}}'Get Started'{{/if}},
+                    onPressed: onGetStarted,
+                    variant: ButtonVariant.primary,
+                    height: ButtonSize.medium,
+                    width: ButtonSize.medium,
+                  ),
+                  SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.md.h{{else}}AppSpacing.md{{/if}}),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

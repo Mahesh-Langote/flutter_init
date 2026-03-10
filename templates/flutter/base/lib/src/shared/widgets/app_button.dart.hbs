@@ -27,7 +27,8 @@ class AppButton extends StatelessWidget {
     required this.label,
     this.onPressed,
     this.variant = ButtonVariant.primary,
-    this.size = ButtonSize.medium,
+    this.height = ButtonSize.medium,
+    this.width,
     this.isLoading = false,
     this.isFullWidth = false,
     this.prefixIcon,
@@ -37,7 +38,8 @@ class AppButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
   final ButtonVariant variant;
-  final ButtonSize size;
+  final ButtonSize height;
+  final ButtonSize? width;
   final bool isLoading;
   final bool isFullWidth;
   final Widget? prefixIcon;
@@ -49,19 +51,26 @@ class AppButton extends StatelessWidget {
     final appColors = Theme.of(context).extension<AppColorsExtension>()!;
     final isDisabled = onPressed == null || isLoading;
 
-    final height = switch (size) {
+    final buttonHeight = switch (height) {
       ButtonSize.small  => {{#if flags.usesScreenutil}}36.h{{else}}36.0{{/if}},
       ButtonSize.medium => {{#if flags.usesScreenutil}}48.h{{else}}48.0{{/if}},
       ButtonSize.large  => {{#if flags.usesScreenutil}}56.h{{else}}56.0{{/if}},
     };
 
-    final horizontalPadding = switch (size) {
+    final buttonWidth = switch (width) {
+      ButtonSize.small  => {{#if flags.usesScreenutil}}100.w{{else}}100.0{{/if}},
+      ButtonSize.medium => {{#if flags.usesScreenutil}}150.w{{else}}150.0{{/if}},
+      ButtonSize.large  => {{#if flags.usesScreenutil}}200.w{{else}}200.0{{/if}},
+      null              => null,
+    };
+
+    final horizontalPadding = switch (height) {
       ButtonSize.small  => {{#if flags.usesScreenutil}}12.w{{else}}12.0{{/if}},
       ButtonSize.medium => {{#if flags.usesScreenutil}}20.w{{else}}20.0{{/if}},
       ButtonSize.large  => {{#if flags.usesScreenutil}}28.w{{else}}28.0{{/if}},
     };
 
-    final fontSize = switch (size) {
+    final fontSize = switch (height) {
       ButtonSize.small  => {{#if flags.usesScreenutil}}12.sp{{else}}12.0{{/if}},
       ButtonSize.medium => {{#if flags.usesScreenutil}}14.sp{{else}}14.0{{/if}},
       ButtonSize.large  => {{#if flags.usesScreenutil}}16.sp{{else}}16.0{{/if}},
@@ -117,8 +126,8 @@ class AppButton extends StatelessWidget {
       duration: AppDurations.fast,
       opacity: isDisabled ? 0.6 : 1.0,
       child: SizedBox(
-        width: isFullWidth ? double.infinity : null,
-        height: height,
+        width: isFullWidth ? double.infinity : buttonWidth,
+        height: buttonHeight,
         child: TextButton(
           onPressed: isDisabled ? null : onPressed,
           style: TextButton.styleFrom(

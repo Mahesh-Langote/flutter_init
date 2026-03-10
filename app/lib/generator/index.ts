@@ -98,7 +98,7 @@ function buildTemplateContext(config: ScaffoldConfig): TemplateContext {
             ? "go_router"
             : config.navigation === "auto_route"
                 ? "auto_route"
-                : undefined
+                : "go_router"
 
     return {
         ...config,
