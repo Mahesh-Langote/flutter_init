@@ -25,9 +25,11 @@ dependencies:
   {{/if}}
 
   # State Management
+  fpdart: ^1.2.0
   flutter_hooks: ^0.20.5
   {{#if flags.isRiverpod}}
   flutter_riverpod: ^2.6.1
+  hooks_riverpod: ^2.6.1
   {{/if}}
   {{#if flags.isProvider}}
   provider: ^6.1.5+1

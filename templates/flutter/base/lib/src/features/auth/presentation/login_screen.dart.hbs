@@ -1,0 +1,447 @@
+{{#if (eq flags.routerPackage "auto_route")}}
+import 'package:auto_route/auto_route.dart';
+{{/if}}
+import '../../../imports/imports.dart';
+import '../../../routing/app_routes.dart';
+
+{{#if flags.isRiverpod}}
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import '../application/auth_provider.dart';
+{{else if flags.isBloc}}
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../application/auth_bloc.dart';
+{{else if flags.isProvider}}
+import 'package:provider/provider.dart';
+import '../application/auth_provider.dart';
+{{else if flags.isGetX}}
+import 'package:get/get.dart';
+import '../application/auth_controller.dart';
+{{else if flags.isMobX}}
+import 'package:provider/provider.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import '../application/auth_store.dart';
+{{/if}}
+
+{{#if (eq flags.routerPackage "auto_route")}}
+@RoutePage()
+{{/if}}
+{{#if flags.isRiverpod}}
+class LoginScreen extends HookConsumerWidget {
+{{else}}
+class LoginScreen extends HookWidget {
+{{/if}}
+  const LoginScreen({super.key});
+
+{{#if flags.isRiverpod}}
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+{{else}}
+  @override
+  Widget build(BuildContext context) {
+{{/if}}
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    final GlobalKey<FormState> formKey =
+        useMemoized(() => GlobalKey<FormState>());
+    final emailController = useTextEditingController();
+    final passwordController = useTextEditingController();
+    final obscurePassword = useState(true);
+    final rememberMe = useState(false);
+{{#if flags.isRiverpod}}
+    final isLoading = ref.watch(authControllerProvider);
+    final String? errorMessage = null; // Error handled by snackbar in Controller
+{{else if flags.isBloc}}
+    final isLoading = context.select((AuthBloc bloc) => bloc.state.isLoading);
+    final errorMessage = context.select((AuthBloc bloc) => bloc.state.errorMessage);
+{{else if flags.isProvider}}
+    final isLoading = context.select((AuthProvider p) => p.isLoading);
+    final errorMessage = context.select((AuthProvider p) => p.errorMessage);
+{{else if flags.isGetX}}
+    final AuthController authController = Get.find<AuthController>();
+    final isLoadingState = useStream(authController.isLoading.stream);
+    final isLoading = isLoadingState.data ?? false;
+    final errorMessageState = useStream(authController.errorMessage.stream);
+    final errorMessage = errorMessageState.data;
+{{else}}
+    final isLoadingState = useState(false);
+    final errorMessageState = useState<String?>(null);
+    final isLoading = isLoadingState.value;
+    final errorMessage = errorMessageState.value;
+{{/if}}
+
+    Future<void> onLogin() async {
+      if (formKey.currentState?.validate() ?? false) {
+        {{#if flags.isRiverpod}}
+        {{else if flags.isBloc}}
+        {{else if flags.isProvider}}
+        {{else if flags.isGetX}}
+        {{else}}
+        isLoadingState.value = true;
+        errorMessageState.value = null;
+        {{/if}}
+
+        try {
+          // Trigger logic based on chosen state management option
+          {{#if flags.isRiverpod}}
+          await ref.read(authControllerProvider.notifier).login(context: context, email: emailController.text, password: passwordController.text);
+          {{else if flags.isBloc}}
+          context.read<AuthBloc>().add(LoginRequested(context: context, email: emailController.text, password: passwordController.text));
+          {{else if flags.isProvider}}
+          await context.read<AuthProvider>().login(context: context, email: emailController.text, password: passwordController.text);
+          {{else if flags.isGetX}}
+          await Get.find<AuthController>().login(context: context, email: emailController.text, password: passwordController.text);
+          {{else if flags.isMobX}}
+          await context.read<AuthStore>().login(context: context, email: emailController.text, password: passwordController.text);
+          {{else}}
+          await Future.delayed(const Duration(seconds: 2));
+          if (context.mounted) {
+            {{#if (eq flags.routerPackage "go_router")}}
+            context.go(AppRoutes.home);
+            {{else if (eq flags.routerPackage "auto_route")}}
+            context.replaceRoute(const HomeRoute());
+            {{else}}
+            Navigator.pushReplacementNamed(context, AppRoutes.home);
+            {{/if}}
+          }
+          {{/if}}
+        } catch (e) {
+          {{#if flags.isRiverpod}}
+          {{else if flags.isBloc}}
+          {{else if flags.isProvider}}
+          {{else if flags.isGetX}}
+          {{else}}
+          errorMessageState.value = e.toString();
+          {{/if}}
+        } finally {
+          if (context.mounted) {
+            {{#if flags.isRiverpod}}
+            {{else if flags.isBloc}}
+            {{else if flags.isProvider}}
+            {{else if flags.isGetX}}
+            {{else}}
+            isLoadingState.value = false;
+            {{/if}}
+          }
+        }
+      }
+    }
+
+    void onSignUp() {
+      // Navigate to sign up
+      {{#if (eq flags.routerPackage "go_router")}}
+      context.push(AppRoutes.signup);
+      {{else if (eq flags.routerPackage "auto_route")}}
+      context.pushRoute(const SignupRoute());
+      {{else}}
+      Navigator.pushNamed(context, AppRoutes.signup);
+      {{/if}}
+    }
+
+    void onForgotPassword() {
+      // Navigate to forgot password
+      {{#if (eq flags.routerPackage "go_router")}}
+      context.push(AppRoutes.forgotPassword);
+      {{else if (eq flags.routerPackage "auto_route")}}
+      context.pushRoute(const ForgotPasswordRoute());
+      {{else}}
+      Navigator.pushNamed(context, AppRoutes.forgotPassword);
+      {{/if}}
+    }
+
+    return Scaffold(
+      backgroundColor: colorScheme.surface,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: {{#if flags.usesScreenutil}}EdgeInsets.symmetric(horizontal: AppSpacing.lg.w){{else}}const EdgeInsets.symmetric(horizontal: AppSpacing.lg){{/if}},
+          child: Form(
+            key: formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.md.h{{else}}AppSpacing.md{{/if}}),
+              // Back Button
+              Align(
+                alignment: Alignment.centerLeft,
+                child: InkWell(
+                  onTap: () {
+                    if (Navigator.canPop(context)) {
+                      Navigator.pop(context);
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(50),
+                  child: Container(
+                    padding: {{#if flags.usesScreenutil}}EdgeInsets.all(AppSpacing.sm.w){{else}}const EdgeInsets.all(AppSpacing.sm){{/if}},
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                    ),
+                    child: Icon(Icons.arrow_back_ios_new, size: {{#if flags.usesScreenutil}}20.sp{{else}}20{{/if}}, color: colorScheme.onSurface),
+                  ),
+                ),
+              ),
+              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.xxl.h{{else}}AppSpacing.xxl{{/if}}),
+              
+              // Title
+              Text(
+                {{#if flags.supportsLocalization}}'auth.log_in'.tr(){{else}}'Log in'{{/if}},
+                textAlign: TextAlign.center,
+                style: textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: colorScheme.onSurface,
+                  {{#if flags.usesScreenutil}}fontSize: 28.sp,{{/if}}
+                ),
+              ),
+              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.sm.h{{else}}AppSpacing.sm{{/if}}),
+              
+              // Subtitle
+              Padding(
+                padding: {{#if flags.usesScreenutil}}EdgeInsets.symmetric(horizontal: AppSpacing.lg.w){{else}}const EdgeInsets.symmetric(horizontal: AppSpacing.lg){{/if}},
+                child: Text(
+                  {{#if flags.supportsLocalization}}'auth.log_in_subtitle'.tr(){{else}}'Enter your email and password to securely access\nyour account and manage your services.'{{/if}},
+                  textAlign: TextAlign.center,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    height: 1.5,
+                    {{#if flags.usesScreenutil}}fontSize: 14.sp,{{/if}}
+                  ),
+                ),
+              ),
+              SizedBox(height: {{#if flags.usesScreenutil}}40.h{{else}}40{{/if}}),
+              
+              // Email Field
+              AppTextField(
+                controller: emailController,
+                enabled: !isLoading,
+                hint: {{#if flags.supportsLocalization}}'auth.email_address'.tr(){{else}}'Email address'{{/if}},
+                keyboardType: TextInputType.emailAddress,
+                prefixIcon: const Icon(Icons.email_outlined),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return {{#if flags.supportsLocalization}}'auth.email_required'.tr(){{else}}'Email is required'{{/if}};
+                  }
+                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                    return {{#if flags.supportsLocalization}}'auth.email_invalid'.tr(){{else}}'Enter a valid email'{{/if}};
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.lg.h{{else}}AppSpacing.lg{{/if}}),
+              
+              // Password Field
+              AppTextField(
+                controller: passwordController,
+                enabled: !isLoading,
+                hint: {{#if flags.supportsLocalization}}'auth.password'.tr(){{else}}'Password'{{/if}},
+                obscureText: obscurePassword.value,
+                prefixIcon: const Icon(Icons.lock_outline),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return {{#if flags.supportsLocalization}}'auth.password_required'.tr(){{else}}'Password is required'{{/if}};
+                  }
+                  if (value.length < 6) {
+                    return {{#if flags.supportsLocalization}}'auth.password_too_short'.tr(){{else}}'Password must be at least 6 characters'{{/if}};
+                  }
+                  return null;
+                },
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    obscurePassword.value ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  onPressed: () => obscurePassword.value = !obscurePassword.value,
+                ),
+              ),
+              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.sm.h{{else}}AppSpacing.sm{{/if}}),
+              
+              // Remember Me & Forgot Password
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: rememberMe.value,
+                        onChanged: (val) => rememberMe.value = val ?? false,
+                        activeColor: colorScheme.primary,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                      ),
+                      Text(
+                        {{#if flags.supportsLocalization}}'auth.remember_me'.tr(){{else}}'Remember me'{{/if}},
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurface,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  TextButton(
+                    onPressed: onForgotPassword,
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: const Size(0, 0),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text(
+                      {{#if flags.supportsLocalization}}'auth.forgot_password'.tr(){{else}}'Forgot Password'{{/if}},
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurface,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: {{#if flags.usesScreenutil}}32.h{{else}}32{{/if}}),
+              
+              // Error Message
+              if (errorMessage != null)
+                Padding(
+                  padding: {{#if flags.usesScreenutil}}EdgeInsets.only(bottom: AppSpacing.md.h){{else}}const EdgeInsets.only(bottom: AppSpacing.md){{/if}},
+                  child: Text(
+                    errorMessage!,
+                    style: textTheme.bodyMedium?.copyWith(color: colorScheme.error),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+
+              // Login Button
+              AppButton(
+                label: {{#if flags.supportsLocalization}}'auth.login_button'.tr(){{else}}'Login'{{/if}},
+                onPressed: isLoading ? null : onLogin,
+                isLoading: isLoading,
+                variant: ButtonVariant.primary,
+                height: ButtonSize.large,
+                isFullWidth: true,
+              ),
+              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.xl.h{{else}}AppSpacing.xl{{/if}}),
+              
+              // Sign Up Link
+              Center(
+                child: InkWell(
+                  onTap: onSignUp,
+                  child: RichText(
+                    text: TextSpan(
+                      text: {{#if flags.supportsLocalization}}'auth.dont_have_account'.tr(){{else}}'Don\'t have an account? '{{/if}},
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: {{#if flags.supportsLocalization}}'auth.sign_up_here'.tr(){{else}}'Sign Up here'{{/if}},
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.xl.h{{else}}AppSpacing.xl{{/if}}),
+              
+              // Divider text
+              Row(
+                children: [
+                  const Expanded(child: AppDivider()),
+                  Padding(
+                    padding: {{#if flags.usesScreenutil}}EdgeInsets.symmetric(horizontal: AppSpacing.md.w){{else}}const EdgeInsets.symmetric(horizontal: AppSpacing.md){{/if}},
+                    child: Text(
+                      {{#if flags.supportsLocalization}}'auth.or_continue_with'.tr(){{else}}'Or Continue With Account'{{/if}},
+                      style: textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  const Expanded(child: AppDivider()),
+                ],
+              ),
+              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.xl.h{{else}}AppSpacing.xl{{/if}}),
+              
+              // Social Buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _SocialButton(
+                    onTap: () {},
+                    iconData: Icons.facebook,
+                    iconColor: const Color(0xFF1877F2),
+                  ),
+                  SizedBox(width: {{#if flags.usesScreenutil}}AppSpacing.md.w{{else}}AppSpacing.md{{/if}}),
+                  // Emulate Google G icon using text for generic material 
+                  _SocialButton(
+                    onTap: () {},
+                    child: Text(
+                      'G',
+                      style: TextStyle(
+                        fontSize: {{#if flags.usesScreenutil}}22.sp{{else}}22{{/if}},
+                        fontWeight: FontWeight.w900,
+                        color: Colors.red, // normally multicolored, simplified here
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: {{#if flags.usesScreenutil}}AppSpacing.md.w{{else}}AppSpacing.md{{/if}}),
+                  _SocialButton(
+                    onTap: () {},
+                    iconData: Icons.apple,
+                    iconColor: colorScheme.onSurface,
+                  ),
+                ],
+              ),
+              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.xxl.h{{else}}AppSpacing.xxl{{/if}}),
+            ],
+          ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SocialButton extends StatelessWidget {
+  final VoidCallback onTap;
+  final IconData? iconData;
+  final Color? iconColor;
+  final Widget? child;
+
+  const _SocialButton({
+    required this.onTap,
+    this.iconData,
+    this.iconColor,
+    this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(50),
+      child: Container(
+        height: {{#if flags.usesScreenutil}}48.h{{else}}48{{/if}},
+        width: {{#if flags.usesScreenutil}}48.w{{else}}48{{/if}},
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        alignment: Alignment.center,
+        child: child ??
+            Icon(
+              iconData,
+              size: {{#if flags.usesScreenutil}}24.sp{{else}}24{{/if}},
+              color: iconColor,
+            ),
+      ),
+    );
+  }
+}

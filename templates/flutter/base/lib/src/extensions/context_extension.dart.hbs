@@ -138,6 +138,7 @@ extension ContextExtension on BuildContext {
   }
   {{/if}}
 
+  {{#unless flags.routerPackage}}
   void pop<T extends Object?>([T? result]) => Navigator.of(this).pop<T>(result);
 
   Future<T?> push<T extends Object?>(Route<T> route) {
@@ -162,4 +163,5 @@ extension ContextExtension on BuildContext {
       arguments: arguments,
     );
   }
+  {{/unless}}
 }
