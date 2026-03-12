@@ -39,28 +39,34 @@ export const architectureSchema = z.enum([
 ])
 export type ArchitectureStyle = z.infer<typeof architectureSchema>
 
+const iconPackSchema = z.object({
+    default: z.literal(true),
+    iconsax_plus: z.boolean(),
+    flutter_remix: z.boolean(),
+    hugeicons: z.boolean(),
+})
+export type IconPackConfig = z.infer<typeof iconPackSchema>
+
 export type StepId =
     | "basics"
     | "theme"
+    | "icons"
     | "architecture"
     | "state"
     | "navigation"
     | "backend"
     | "localization"
-    | "packages"
-    | "extras"
     | "generate"
 
 export const stepOrder: StepId[] = [
     "basics",
     "theme",
+    "icons",
     "architecture",
     "state",
     "navigation",
     "backend",
     "localization",
-    "packages",
-    "extras",
     "generate",
 ]
 
@@ -113,33 +119,6 @@ const backendSchema = z.discriminatedUnion("provider", [
 ])
 export type BackendConfig = z.infer<typeof backendSchema>
 
-const packagesSchema = z.object({
-    dio: z.boolean(),
-    http: z.boolean(),
-    hive: z.boolean(),
-    sharedPreferences: z.boolean(),
-    flutterSecureStorage: z.boolean(),
-    cachedNetworkImage: z.boolean(),
-    flutterSvg: z.boolean(),
-    skeletonizer: z.boolean(),
-    flutterScreenutil: z.boolean(),
-    flutterAnimate: z.boolean(),
-    flutterDotenv: z.boolean(),
-    logger: z.boolean(),
-})
-export type PackagesConfig = z.infer<typeof packagesSchema>
-
-const extrasSchema = z.object({
-    errorHandling: z.boolean(),
-    loadingStates: z.boolean(),
-    networkConnectivity: z.boolean(),
-    baseWidgets: z.boolean(),
-    splashScreen: z.boolean(),
-    appIcon: z.boolean(),
-    flavors: z.boolean(),
-})
-export type ExtrasConfig = z.infer<typeof extrasSchema>
-
 const localizationSchema = z.object({
     enabled: z.boolean(),
     supportedLocales: z.array(z.string()).min(1),
@@ -155,9 +134,13 @@ export const scaffoldConfigSchema = z.object({
     backend: backendSchema,
     localization: localizationSchema,
     navigation: navigationSchema,
-    commonPackages: packagesSchema,
     architecture: architectureSchema,
-    extras: extrasSchema,
+    icons: iconPackSchema.default({
+        default: true,
+        iconsax_plus: false,
+        flutter_remix: false,
+        hugeicons: false,
+    }),
 })
 
 export type ScaffoldConfig = z.infer<typeof scaffoldConfigSchema>
@@ -184,35 +167,17 @@ export const defaultConfig: ScaffoldConfig = {
         primaryColor: "#6750A4",
         darkMode: { enabled: true, system: true },
     },
+    icons: {
+        default: true,
+        iconsax_plus: false,
+        flutter_remix: false,
+        hugeicons: false,
+    },
     stateManagement: "riverpod",
     backend: { provider: "none" },
     localization: { enabled: true, supportedLocales: ["en", "es"] },
     navigation: "go_router",
-    commonPackages: {
-        dio: true,
-        http: false,
-
-        hive: false,
-        sharedPreferences: true,
-        flutterSecureStorage: true,
-        cachedNetworkImage: true,
-        flutterSvg: true,
-        skeletonizer: true,
-        flutterScreenutil: true,
-        flutterAnimate: true,
-        flutterDotenv: true,
-        logger: true,
-    },
     architecture: "feature-first",
-    extras: {
-        errorHandling: true,
-        loadingStates: true,
-        networkConnectivity: true,
-        baseWidgets: true,
-        splashScreen: true,
-        appIcon: false,
-        flavors: true,
-    },
 }
 
 export function defaultBackendConfig(
@@ -282,40 +247,6 @@ export const navigationOptions = [
     { value: "getx", label: "GetX Routing", description: "Simple and powerful routing without context." },
     { value: "auto_route", label: "auto_route", description: "Code generation based routing. Strong typing and guards." },
 ] as const satisfies Array<{ value: NavigationStyle; label: string; description: string }>
-
-export const packageOptions: Array<{
-    key: keyof PackagesConfig
-    label: string
-    description?: string
-}> = [
-        { key: "dio", label: "dio", description: "Powerful HTTP client for Dart with Interceptors and Global configuration." },
-        { key: "http", label: "http", description: "A composable, Future-based library for making HTTP requests." },
-
-        { key: "hive", label: "hive", description: "Lightweight and blazing fast key-value database." },
-        { key: "sharedPreferences", label: "shared_preferences", description: "Persistent storage for simple data." },
-        { key: "flutterSecureStorage", label: "flutter_secure_storage", description: "Secure storage for sensitive data (Keychain/Keystore)." },
-        { key: "cachedNetworkImage", label: "cached_network_image", description: "Mandatory for production apps to cache web images locally." },
-        { key: "flutterSvg", label: "flutter_svg", description: "The standard for rendering SVG assets natively." },
-        { key: "skeletonizer", label: "skeletonizer", description: "For creating modern, skeleton-loading placeholders." },
-        { key: "flutterScreenutil", label: "flutter_screenutil", description: "Adapting screen and font size for different screen sizes." },
-        { key: "flutterAnimate", label: "flutter_animate", description: "Intuitive way to add complex, chaining animations to widgets." },
-        { key: "flutterDotenv", label: "flutter_dotenv", description: "Load configuration configuration from a .env file." },
-        { key: "logger", label: "logger", description: "Small, easy to use and extensible logger which prints beautiful logs." },
-    ]
-
-export const extrasOptions: Array<{
-    key: keyof ExtrasConfig
-    label: string
-    description?: string
-}> = [
-        { key: "errorHandling", label: "Error handling setup" },
-        { key: "loadingStates", label: "Loading & empty states" },
-        { key: "networkConnectivity", label: "Network connectivity checker" },
-        { key: "baseWidgets", label: "Base widgets (Button, TextField)" },
-        { key: "splashScreen", label: "Splash screen" },
-        { key: "appIcon", label: "App icon" },
-        { key: "flavors", label: "Flavors (dev/staging/prod)" },
-    ]
 
 export const localizationOptions = [
     { value: "en", label: "English" },

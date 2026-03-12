@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
         const zipBuffer = await generateFlutterScaffold(config)
         const fileName = `${config.appName.replace(/\s+/g, "-").toLowerCase()}.zip`
 
-        return new Response(zipBuffer, {
+        return new Response(zipBuffer as any, {
             status: 200,
             headers: {
                 "Content-Type": "application/zip",

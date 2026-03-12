@@ -2,11 +2,10 @@ import { StepId } from "@/app/lib/config/schema"
 import { ArchitectureStep } from "./steps/ArchitectureStep"
 import { BackendStep } from "./steps/BackendStep"
 import { BasicsStep } from "./steps/BasicsStep"
-import { ExtrasStep } from "./steps/ExtrasStep"
 import { GenerateStep } from "./steps/GenerateStep"
+import { IconsStep } from "./steps/IconsStep"
 import { LocalizationStep } from "./steps/LocalizationStep"
 import { NavigationStep } from "./steps/NavigationStep"
-import { PackagesStep } from "./steps/PackagesStep"
 import { StateStep } from "./steps/StateStep"
 import { ThemeStep } from "./steps/ThemeStep"
 
@@ -16,6 +15,8 @@ export function StepContent({ step }: { step: StepId }) {
             return <BasicsStep />
         case "theme":
             return <ThemeStep />
+        case "icons":
+            return <IconsStep />
         case "architecture":
             return <ArchitectureStep />
         case "state":
@@ -26,10 +27,6 @@ export function StepContent({ step }: { step: StepId }) {
             return <BackendStep />
         case "localization":
             return <LocalizationStep />
-        case "packages":
-            return <PackagesStep />
-        case "extras":
-            return <ExtrasStep />
         case "generate":
         default:
             return <GenerateStep />

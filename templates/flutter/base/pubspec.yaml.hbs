@@ -26,6 +26,7 @@ dependencies:
 
   # State Management
   fpdart: ^1.2.0
+  equatable: ^2.0.7
   flutter_hooks: ^0.20.5
   {{#if flags.isRiverpod}}
   flutter_riverpod: ^2.6.1
@@ -96,6 +97,17 @@ dependencies:
   {{/if}}
   {{#if flags.usesFlutterSvg}}
   flutter_svg: ^2.2.4
+  {{/if}}
+
+  # Icons
+  {{#if flags.usesIconsaxPlus}}
+  iconsax_plus: ^1.0.0
+  {{/if}}
+  {{#if flags.usesFlutterRemix}}
+  flutter_remix: ^0.0.3
+  {{/if}}
+  {{#if flags.usesHugeicons}}
+  hugeicons: ^1.1.5
   {{/if}}
 
   # Shimmer / Skeleton

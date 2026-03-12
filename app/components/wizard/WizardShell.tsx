@@ -21,6 +21,10 @@ const steps: Record<
         title: "UI & theme",
         description: "Choose theming, primary color, and dark mode.",
     },
+    icons: {
+        title: "Icons",
+        description: "Select which icon packs to include.",
+    },
     architecture: {
         title: "Architecture",
         description: "Choose how features are organized.",
@@ -40,14 +44,6 @@ const steps: Record<
     localization: {
         title: "Localization",
         description: "Setup easily with easy_localization.",
-    },
-    packages: {
-        title: "Common Packages",
-        description: "Select networking and utilities.",
-    },
-    extras: {
-        title: "Extras",
-        description: "Add polish like splash screens, and flavors.",
     },
     generate: {
         title: "Generate",

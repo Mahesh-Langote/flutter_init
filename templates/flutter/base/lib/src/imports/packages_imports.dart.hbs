@@ -2,9 +2,10 @@
 export 'package:flutter_screenutil/flutter_screenutil.dart';
 {{/if}}
 export 'package:flutter_hooks/flutter_hooks.dart';
+export 'package:equatable/equatable.dart';
 {{#if flags.isRiverpod}}
 export 'package:flutter_riverpod/flutter_riverpod.dart' hide describeIdentity, shortHash;
-export 'package:hooks_riverpod/hooks_riverpod.dart';
+export 'package:hooks_riverpod/hooks_riverpod.dart' hide describeIdentity, shortHash;
 {{/if}}
 {{#if flags.isProvider}}
 export 'package:provider/provider.dart';
@@ -26,6 +27,15 @@ export 'package:cached_network_image/cached_network_image.dart';
 {{/if}}
 {{#if flags.usesFlutterSvg}}
 export 'package:flutter_svg/flutter_svg.dart';
+{{/if}}
+{{#if flags.usesIconsaxPlus}}
+export 'package:iconsax_plus/iconsax_plus.dart';
+{{/if}}
+{{#if flags.usesFlutterRemix}}
+export 'package:flutter_remix/flutter_remix.dart';
+{{/if}}
+{{#if flags.usesHugeicons}}
+export 'package:hugeicons/hugeicons.dart';
 {{/if}}
 {{#if flags.usesSkeletonizer}}
 export 'package:skeletonizer/skeletonizer.dart';

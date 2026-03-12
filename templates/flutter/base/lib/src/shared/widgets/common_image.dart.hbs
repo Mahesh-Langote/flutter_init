@@ -104,7 +104,27 @@ class CommonImage extends StatelessWidget {
       width: width,
       height: height,
       color: Colors.grey[200],
-      child: const Icon(Icons.error_outline, color: Colors.grey),
+      child: {{#if flags.usesHugeicons}}
+          const HugeIcon(
+            icon: HugeIcons.strokeRoundedImageNotFound02,
+            size: 24,
+          )
+        {{else if flags.usesIconsaxPlus}}
+          const Icon(
+            IconsaxPlusBold.image,
+            color: Colors.grey,
+          )
+        {{else if flags.usesFlutterRemix}}
+          const Icon(
+            FlutterRemix.image_line,
+            color: Colors.grey,
+          )
+        {{else}}
+          const Icon(
+            Icons.error_outline,
+            color: Colors.grey,
+          )
+        {{/if}},
     );
   }
 }

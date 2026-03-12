@@ -1,18 +1,10 @@
 "use client"
 
-import { extrasOptions, packageOptions } from "@/app/lib/config/schema"
 import { useWizard } from "@/app/lib/state/useWizardStore"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import * as React from "react"
 import { SummaryItem } from "../SummaryItem"
-// assuming icons are available or I'll remove them if not
-// Wait, I saw lucide-react in package.json? No I didn't see it explicitly.
-// But shadcn uses it. I'll check if lucide-react is installed.
-// If uncertain, I'll avoid imports or use a safe fallback.
-// In page.tsx no lucide icons were used.
-// Let's stick to no icons to be safe, or just text.
 
 export function GenerateStep() {
     const { config, prev } = useWizard()
@@ -64,34 +56,17 @@ export function GenerateStep() {
                     <SummaryItem label="State" value={config.stateManagement} />
                     <SummaryItem label="Navigation" value={config.navigation} />
                     <SummaryItem label="Backend" value={config.backend.provider} />
-                </div>
-
-                <div className="rounded-xl border border-border/40 bg-card/30 p-5 backdrop-blur-sm">
-                    <p className="text-sm font-semibold mb-3">Packages</p>
-                    <div className="flex flex-wrap gap-2">
-                        {packageOptions
-                            .filter((pkg) => config.commonPackages[pkg.key as keyof typeof config.commonPackages])
-                            .map((pkg) => (
-                                <Badge key={pkg.key} variant="secondary" className="bg-secondary/50 hover:bg-secondary/70 transition-colors">
-                                    {pkg.label}
-                                </Badge>
-                            ))}
-                        {Object.values(config.commonPackages).every(v => !v) && <span className="text-xs text-muted-foreground">None selected</span>}
-                    </div>
-                </div>
-
-                <div className="rounded-xl border border-border/40 bg-card/30 p-5 backdrop-blur-sm">
-                    <p className="text-sm font-semibold mb-3">Extras</p>
-                    <div className="flex flex-wrap gap-2">
-                        {extrasOptions
-                            .filter((extra) => config.extras[extra.key as keyof typeof config.extras])
-                            .map((extra) => (
-                                <Badge key={extra.key} variant="secondary" className="bg-secondary/50 hover:bg-secondary/70 transition-colors">
-                                    {extra.label}
-                                </Badge>
-                            ))}
-                        {Object.values(config.extras).every(v => !v) && <span className="text-xs text-muted-foreground">None selected</span>}
-                    </div>
+                    <SummaryItem
+                        label="Icons"
+                        value={[
+                            "default",
+                            config.icons.iconsax_plus && "iconsax_plus",
+                            config.icons.flutter_remix && "flutter_remix",
+                            config.icons.hugeicons && "hugeicons",
+                        ]
+                            .filter(Boolean)
+                            .join(", ")}
+                    />
                 </div>
 
                 {error ? (

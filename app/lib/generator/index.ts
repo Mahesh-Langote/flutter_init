@@ -35,6 +35,9 @@ type TemplateContext = ScaffoldConfig & {
         usesAnimate: boolean
         usesDotenv: boolean
         usesLogger: boolean
+        usesIconsaxPlus: boolean
+        usesFlutterRemix: boolean
+        usesHugeicons: boolean
         supportsLocalization: boolean
         supportedLocales: string[]
         fallbackLocale: string
@@ -116,24 +119,26 @@ function buildTemplateContext(config: ScaffoldConfig): TemplateContext {
             usesSupabase: config.backend.provider === "supabase",
             usesAppwrite: config.backend.provider === "appwrite",
             usesCustomRest: config.backend.provider === "customRest",
-            usesDio: config.commonPackages.dio,
-            usesHttp: config.commonPackages.http,
-
-            usesHive: config.commonPackages.hive,
-            usesSharedPreferences: config.commonPackages.sharedPreferences,
-            usesSecureStorage: config.commonPackages.flutterSecureStorage,
-            usesCachedNetworkImage: config.commonPackages.cachedNetworkImage,
-            usesFlutterSvg: config.commonPackages.flutterSvg,
-            usesSkeletonizer: config.commonPackages.skeletonizer,
-            usesScreenutil: config.commonPackages.flutterScreenutil,
-            usesAnimate: config.commonPackages.flutterAnimate,
-            usesDotenv: config.commonPackages.flutterDotenv,
-            usesLogger: config.commonPackages.logger,
+            usesDio: config.backend.provider === "customRest",
+            usesHttp: false,
+            usesHive: false,
+            usesSharedPreferences: true,
+            usesSecureStorage: true,
+            usesCachedNetworkImage: true,
+            usesFlutterSvg: true,
+            usesSkeletonizer: true,
+            usesScreenutil: true,
+            usesAnimate: true,
+            usesDotenv: true,
+            usesLogger: true,
             supportsLocalization: config.localization.enabled,
             supportedLocales: config.localization.supportedLocales.length > 0 ? config.localization.supportedLocales : ["en"],
             fallbackLocale: config.localization.supportedLocales.length > 0 ? config.localization.supportedLocales[0] : "en",
-            hasFlavors: config.extras.flavors,
+            hasFlavors: true,
             hasDarkMode: config.theme.darkMode.enabled,
+            usesIconsaxPlus: config.icons.iconsax_plus,
+            usesFlutterRemix: config.icons.flutter_remix,
+            usesHugeicons: config.icons.hugeicons,
         },
     }
 }
@@ -155,13 +160,12 @@ async function resolveOverlayDirs(
             path.join(root, "overlays", "routing", "auto_route"),
             config.navigation === "auto_route",
         ],
-        [path.join(root, "overlays", "networking", "dio"), config.commonPackages.dio],
-        [path.join(root, "overlays", "networking", "http"), config.commonPackages.http],
+        [path.join(root, "overlays", "networking", "dio"), config.backend.provider === "customRest"],
+        [path.join(root, "overlays", "networking", "http"), false],
         [path.join(root, "overlays", "extras", "localization"), config.localization.enabled],
-        [path.join(root, "overlays", "extras", "base_widgets"), config.extras.baseWidgets],
-        [path.join(root, "overlays", "storage", "secure_storage"), config.commonPackages.flutterSecureStorage],
-        [path.join(root, "overlays", "extras", "flavors"), config.extras.flavors],
-        [path.join(root, "overlays", "extras", "dotenv"), config.commonPackages.flutterDotenv],
+        [path.join(root, "overlays", "storage", "secure_storage"), true],
+        [path.join(root, "overlays", "extras", "flavors"), true],
+        [path.join(root, "overlays", "extras", "dotenv"), true],
     ]
 
     for (const [candidate, enabled] of candidates) {

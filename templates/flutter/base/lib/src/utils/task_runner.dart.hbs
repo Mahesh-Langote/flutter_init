@@ -6,12 +6,32 @@ import 'typedefs.dart';
 
 /// A reusable generic function to handle potential exceptions in async tasks
 /// and map them to the [Either] type matching [FutureEither<T>].
-FutureEither<T> runTask<T>(Future<T> Function() action) async {
+///
+/// If [requiresNetwork] is `true` and [isNetworkAvailable] returns `false`,
+/// the [action] will not be executed and a [NetworkFailure] will be returned.
+FutureEither<T> runTask<T>(
+  Future<T> Function() action, {
+  bool requiresNetwork = false,
+  Future<bool> Function()? isNetworkAvailable,
+}) async {
   try {
+    if (requiresNetwork && isNetworkAvailable != null) {
+      final hasNetwork = await isNetworkAvailable();
+
+      if (!hasNetwork) {
+        AppLogger.warning('Network unavailable for task');
+        return left(
+          const NetworkFailure(
+            'No internet connection. Please check your connection and try again.',
+          ),
+        );
+      }
+    }
+
     final result = await action();
     return right(result);
   } catch (error, stackTrace) {
-    AppLogger.error('Task execution failed', error: error, stackTrace: stackTrace);
+    AppLogger.error('Task execution failed', [error, stackTrace]);
     final errorMessage = AppErrorHandler.format(error);
     
     // Depending on logic, map error strings/types to specific Failure variants
