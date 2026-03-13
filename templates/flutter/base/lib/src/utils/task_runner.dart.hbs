@@ -3,6 +3,8 @@ import 'error_handler.dart';
 import 'failure.dart';
 import 'logger.dart';
 import 'typedefs.dart';
+import '../services/internet_connection_service.dart';
+import '../helpers/imports.dart';
 
 /// A reusable generic function to handle potential exceptions in async tasks
 /// and map them to the [Either] type matching [FutureEither<T>].
@@ -12,14 +14,18 @@ import 'typedefs.dart';
 FutureEither<T> runTask<T>(
   Future<T> Function() action, {
   bool requiresNetwork = false,
-  Future<bool> Function()? isNetworkAvailable,
 }) async {
   try {
-    if (requiresNetwork && isNetworkAvailable != null) {
-      final hasNetwork = await isNetworkAvailable();
+    if (requiresNetwork) {
+      final hasNetwork = await InternetConnectionService().hasConnection();
 
       if (!hasNetwork) {
         AppLogger.warning('Network unavailable for task');
+        showGlobalToast(
+          message:
+              'No internet connection. Please check your connection and try again.',
+          status: 'warning',
+        );
         return left(
           const NetworkFailure(
             'No internet connection. Please check your connection and try again.',

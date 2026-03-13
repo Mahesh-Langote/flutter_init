@@ -1,11 +1,11 @@
 import 'imports/imports.dart';
+import 'routing/global_navigator.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
 
   @override
   Widget build(BuildContext context) {
-    {{#if flags.usesScreenutil}}
     return ScreenUtilInit(
       designSize: const Size(360, 690),
       minTextAdapt: true,
@@ -14,13 +14,11 @@ class App extends StatelessWidget {
         return _buildMaterialApp(context);
       },
     );
-    {{else}}
-    return _buildMaterialApp(context);
-    {{/if}}
   }
 
   Widget _buildMaterialApp(BuildContext context) {
     return MaterialApp{{#if flags.routerPackage}}.router{{/if}}(
+      key: rootNavigatorKey,
       title: '{{appName}}',
       debugShowCheckedModeBanner: false,
       theme: buildLightTheme(primaryColorHex: '{{theme.primaryColor}}'),

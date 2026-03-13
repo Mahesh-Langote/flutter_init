@@ -44,11 +44,11 @@ class OnboardingPage extends HookWidget {
     void onGetStarted() {
       // Navigate back or to home. For template purpose:
       {{#if (eq flags.routerPackage "go_router")}}
-      context.go(AppRoutes.home);
+      context.go(AppRoutes.login);
       {{else if (eq flags.routerPackage "auto_route")}}
-      ontext.replaceRoute(const HomeRoute());
+      context.replaceRoute(const LoginRoute());
       {{else}}
-      Navigator.pushReplacementNamed(context, AppRoutes.home);
+      Navigator.pushReplacementNamed(context, AppRoutes.login);
       {{/if}}
     }
 
@@ -59,15 +59,18 @@ class OnboardingPage extends HookWidget {
           children: [
             // Top branding
             Padding(
-              padding: {{#if flags.usesScreenutil}}EdgeInsets.only(top: AppSpacing.lg.h, bottom: AppSpacing.md.h){{else}}const EdgeInsets.only(top: AppSpacing.lg, bottom: AppSpacing.md){{/if}},
+              padding: EdgeInsets.only(
+                top: AppSpacing.lg.h,
+                bottom: AppSpacing.md.h,
+              ),
               child: Text(
-                    'WanderWise.',
-                    style: textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w900,
-                      color: colorScheme.onSurface,
-                      {{#if flags.usesScreenutil}}fontSize: 22.sp,{{/if}}
-                    ),
-                  ),
+                'WanderWise.',
+                style: textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: colorScheme.onSurface,
+                  fontSize: 22.sp,
+                ),
+              ),
             ),
 
             // PageView
@@ -85,7 +88,9 @@ class OnboardingPage extends HookWidget {
                       Expanded(
                         child: Center(
                           child: Padding(
-                            padding: {{#if flags.usesScreenutil}}EdgeInsets.symmetric(horizontal: AppSpacing.lg.w){{else}}const EdgeInsets.symmetric(horizontal: AppSpacing.lg){{/if}},
+                            padding: EdgeInsets.symmetric(
+                              horizontal: AppSpacing.lg.w,
+                            ),
                             child: onboardingData[index]['pageWidget'] as Widget,
                           ),
                         ),
@@ -93,7 +98,9 @@ class OnboardingPage extends HookWidget {
                       
                       // Text Section
                       Padding(
-                        padding: {{#if flags.usesScreenutil}}EdgeInsets.symmetric(horizontal: AppSpacing.xl.w){{else}}const EdgeInsets.symmetric(horizontal: AppSpacing.xl){{/if}},
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppSpacing.xl.w,
+                        ),
                         child: Column(
                           children: [
                             Text(
@@ -103,23 +110,23 @@ class OnboardingPage extends HookWidget {
                                 fontWeight: FontWeight.w700,
                                 color: colorScheme.onSurface,
                                 height: 1.2,
-                                {{#if flags.usesScreenutil}}fontSize: 24.sp,{{/if}}
+                                fontSize: 24.sp,
                               ),
                             ),
-                            SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.md.h{{else}}AppSpacing.md{{/if}}),
+                            SizedBox(height: AppSpacing.md.h),
                             Text(
                               onboardingData[index]['subtitle'] as String,
                               textAlign: TextAlign.center,
                               style: textTheme.bodyMedium?.copyWith(
                                 color: colorScheme.onSurfaceVariant,
                                 height: 1.5,
-                                {{#if flags.usesScreenutil}}fontSize: 14.sp,{{/if}}
+                                fontSize: 14.sp,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(height: {{#if flags.usesScreenutil}}40.h{{else}}40{{/if}}),
+                      SizedBox(height: 40.h),
                     ],
                   );
                 },
@@ -128,7 +135,7 @@ class OnboardingPage extends HookWidget {
 
             // Bottom Section: Dots and Button
             Padding(
-              padding: {{#if flags.usesScreenutil}}EdgeInsets.all(AppSpacing.xl.w){{else}}const EdgeInsets.all(AppSpacing.xl){{/if}},
+              padding: EdgeInsets.all(AppSpacing.xl.w),
               child: Column(
                 children: [
                   // Dot Indicators
@@ -138,12 +145,12 @@ class OnboardingPage extends HookWidget {
                     effect: ExpandingDotsEffect(
                       activeDotColor: colorScheme.primary,
                       dotColor: colorScheme.primary.withOpacity(0.2),
-                      dotHeight: {{#if flags.usesScreenutil}}8.h{{else}}8{{/if}},
-                      dotWidth: {{#if flags.usesScreenutil}}8.w{{else}}8{{/if}},
-                      spacing: {{#if flags.usesScreenutil}}8.w{{else}}8{{/if}},
+                      dotHeight: 8.h,
+                      dotWidth: 8.w,
+                      spacing: 8.w,
                     ),
                   ),
-                  SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.xl.h{{else}}AppSpacing.xl{{/if}}),
+                  SizedBox(height: AppSpacing.xl.h),
                   // Get Started Button
                   AppButton(
                     label: {{#if flags.supportsLocalization}}'shared.get_started'.tr(){{else}}'Get Started'{{/if}},
@@ -152,7 +159,7 @@ class OnboardingPage extends HookWidget {
                     height: ButtonSize.medium,
                     width: ButtonSize.medium,
                   ),
-                  SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.md.h{{else}}AppSpacing.md{{/if}}),
+                  SizedBox(height: AppSpacing.md.h),
                 ],
               ),
             ),

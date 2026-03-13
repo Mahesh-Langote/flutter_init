@@ -59,10 +59,10 @@ export function GenerateStep() {
                     <SummaryItem
                         label="Icons"
                         value={[
-                            "default",
-                            config.icons.iconsax_plus && "iconsax_plus",
-                            config.icons.flutter_remix && "flutter_remix",
-                            config.icons.hugeicons && "hugeicons",
+                            "Default",
+                            config.icons.iconsax_plus && "Iconsax Plus",
+                            config.icons.flutter_remix && "Flutter Remix",
+                            config.icons.hugeicons && "Hugeicons",
                         ]
                             .filter(Boolean)
                             .join(", ")}

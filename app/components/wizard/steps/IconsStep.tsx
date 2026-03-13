@@ -16,16 +16,18 @@ export function IconsStep() {
         updateConfig({
             icons: {
                 ...icons,
-                [key]: value,
+                iconsax_plus: key === "iconsax_plus" ? value : false,
+                flutter_remix: key === "flutter_remix" ? value : false,
+                hugeicons: key === "hugeicons" ? value : false,
             },
         })
     }
 
     const selectedIcons = [
         "Default",
-        icons.iconsax_plus && "iconsax_plus",
-        icons.flutter_remix && "flutter_remix",
-        icons.hugeicons && "hugeicons",
+        icons.iconsax_plus && "Iconsax Plus",
+        icons.flutter_remix && "Flutter Remix",
+        icons.hugeicons && "Hugeicons",
     ]
         .filter(Boolean)
         .join(", ")
@@ -49,17 +51,17 @@ export function IconsStep() {
                         disabled
                     />
                     <ToggleRow
-                        label="iconsax_plus"
+                        label="Iconsax Plus"
                         checked={icons.iconsax_plus}
                         onCheckedChange={(value) => handleToggle("iconsax_plus", value)}
                     />
                     <ToggleRow
-                        label="flutter_remix"
+                        label="Flutter Remix"
                         checked={icons.flutter_remix}
                         onCheckedChange={(value) => handleToggle("flutter_remix", value)}
                     />
                     <ToggleRow
-                        label="hugeicons"
+                        label="Hugeicons"
                         checked={icons.hugeicons}
                         onCheckedChange={(value) => handleToggle("hugeicons", value)}
                     />

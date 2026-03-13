@@ -17,6 +17,7 @@ dependencies:
   {{/if}}
 
   # Networking
+  internet_connection_checker_plus: ^2.9.1+2
   {{#if flags.usesDio}}
   dio: ^5.9.2
   {{/if}}
@@ -116,9 +117,7 @@ dependencies:
   {{/if}}
 
   # Responsive UI
-  {{#if flags.usesScreenutil}}
   flutter_screenutil: ^5.9.3
-  {{/if}}
 
   # Animations
   {{#if flags.usesAnimate}}

@@ -1,6 +1,4 @@
-import '../../imports/core_imports.dart';
-
-import 'app_button.dart';
+import '../../imports/imports.dart';
 
 /// Displays an empty state with an icon, title, optional subtitle, and action.
 ///
@@ -17,7 +15,7 @@ import 'app_button.dart';
 class AppEmptyState extends StatelessWidget {
   const AppEmptyState({
     super.key,
-    this.icon = Icons.inbox_outlined,
+    this.icon = {{#if flags.usesIconsaxPlus}}IconsaxPlusLinear.box{{else if flags.usesFlutterRemix}}FlutterRemix.inbox_line{{else if flags.usesHugeicons}}HugeIcons.strokeRoundedInbox{{else}}Icons.inbox_outlined{{/if}},
     required this.title,
     this.subtitle,
     this.actionLabel,

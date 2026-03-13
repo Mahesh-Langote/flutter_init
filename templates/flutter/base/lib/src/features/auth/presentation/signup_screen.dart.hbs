@@ -148,36 +148,16 @@ class SignupScreen extends HookWidget {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
+      appBar: AppTopBar(title: {{#if flags.supportsLocalization}}'auth.create_account'.tr(){{else}}'Create Account'{{/if}},),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: {{#if flags.usesScreenutil}}EdgeInsets.symmetric(horizontal: AppSpacing.lg.w){{else}}const EdgeInsets.symmetric(horizontal: AppSpacing.lg){{/if}},
+          padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg.w),
           child: Form(
             key: formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.md.h{{else}}AppSpacing.md{{/if}}),
-              // Back Button
-              Align(
-                alignment: Alignment.centerLeft,
-                child: InkWell(
-                  onTap: () {
-                    if (Navigator.canPop(context)) {
-                      Navigator.pop(context);
-                    }
-                  },
-                  borderRadius: BorderRadius.circular(50),
-                  child: Container(
-                    padding: {{#if flags.usesScreenutil}}EdgeInsets.all(AppSpacing.sm.w){{else}}const EdgeInsets.all(AppSpacing.sm){{/if}},
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
-                    ),
-                    child: Icon(Icons.arrow_back_ios_new, size: {{#if flags.usesScreenutil}}20.sp{{else}}20{{/if}}, color: colorScheme.onSurface),
-                  ),
-                ),
-              ),
-              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.xl.h{{else}}AppSpacing.xl{{/if}}),
+              SizedBox(height: AppSpacing.xl.h),
               
               // Title
               Text(
@@ -186,25 +166,25 @@ class SignupScreen extends HookWidget {
                 style: textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                   color: colorScheme.onSurface,
-                  {{#if flags.usesScreenutil}}fontSize: 28.sp,{{/if}}
+                  fontSize: 28.sp,
                 ),
               ),
-              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.sm.h{{else}}AppSpacing.sm{{/if}}),
+              SizedBox(height: AppSpacing.sm.h),
               
               // Subtitle
               Padding(
-                padding: {{#if flags.usesScreenutil}}EdgeInsets.symmetric(horizontal: AppSpacing.lg.w){{else}}const EdgeInsets.symmetric(horizontal: AppSpacing.lg){{/if}},
+                padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg.w),
                 child: Text(
                   {{#if flags.supportsLocalization}}'auth.create_account_subtitle'.tr(){{else}}'Create a new account to get started and enjoy\nseamless access to our features.'{{/if}},
                   textAlign: TextAlign.center,
                   style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                     height: 1.5,
-                    {{#if flags.usesScreenutil}}fontSize: 14.sp,{{/if}}
+                    fontSize: 14.sp,
                   ),
                 ),
               ),
-              SizedBox(height: {{#if flags.usesScreenutil}}32.h{{else}}32{{/if}}),
+              SizedBox(height: 32.h),
               
               // Name Field
               AppTextField(
@@ -212,7 +192,17 @@ class SignupScreen extends HookWidget {
                 enabled: !isLoading,
                 hint: {{#if flags.supportsLocalization}}'auth.name'.tr(){{else}}'Name'{{/if}},
                 keyboardType: TextInputType.name,
-                prefixIcon: const Icon(Icons.person_outline),
+                prefixIcon: const Icon(
+                  {{#if flags.usesIconsaxPlus}}
+                  IconsaxPlusLinear.user,
+                  {{else if flags.usesFlutterRemix}}
+                  FlutterRemix.user_line,
+                  {{else if flags.usesHugeicons}}
+                  HugeIcons.strokeRoundedUser,
+                  {{else}}
+                  Icons.person_outline,
+                  {{/if}}
+                ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return {{#if flags.supportsLocalization}}'auth.name_required'.tr(){{else}}'Name is required'{{/if}};
@@ -220,7 +210,7 @@ class SignupScreen extends HookWidget {
                   return null;
                 },
               ),
-              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.lg.h{{else}}AppSpacing.lg{{/if}}),
+              SizedBox(height: AppSpacing.lg.h),
               
               // Email Field
               AppTextField(
@@ -228,18 +218,28 @@ class SignupScreen extends HookWidget {
                 enabled: !isLoading,
                 hint: {{#if flags.supportsLocalization}}'auth.email_address'.tr(){{else}}'Email address'{{/if}},
                 keyboardType: TextInputType.emailAddress,
-                prefixIcon: const Icon(Icons.email_outlined),
+                prefixIcon: const Icon(
+                  {{#if flags.usesIconsaxPlus}}
+                  IconsaxPlusLinear.sms,
+                  {{else if flags.usesFlutterRemix}}
+                  FlutterRemix.mail_line,
+                  {{else if flags.usesHugeicons}}
+                  HugeIcons.strokeRoundedMail01,
+                  {{else}}
+                  Icons.email_outlined,
+                  {{/if}}
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return {{#if flags.supportsLocalization}}'auth.email_required'.tr(){{else}}'Email is required'{{/if}};
                   }
-                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                  if (!value.isEmail) {
                     return {{#if flags.supportsLocalization}}'auth.email_invalid'.tr(){{else}}'Enter a valid email'{{/if}};
                   }
                   return null;
                 },
               ),
-              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.lg.h{{else}}AppSpacing.lg{{/if}}),
+              SizedBox(height: AppSpacing.lg.h),
               
               // Password Field
               AppTextField(
@@ -247,7 +247,17 @@ class SignupScreen extends HookWidget {
                 enabled: !isLoading,
                 hint: {{#if flags.supportsLocalization}}'auth.password'.tr(){{else}}'Password'{{/if}},
                 obscureText: obscurePassword.value,
-                prefixIcon: const Icon(Icons.lock_outline),
+                prefixIcon: const Icon(
+                  {{#if flags.usesIconsaxPlus}}
+                  IconsaxPlusLinear.lock,
+                  {{else if flags.usesFlutterRemix}}
+                  FlutterRemix.lock_line,
+                  {{else if flags.usesHugeicons}}
+                  HugeIcons.strokeRoundedLock01,
+                  {{else}}
+                  Icons.lock_outline,
+                  {{/if}}
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return {{#if flags.supportsLocalization}}'auth.password_required'.tr(){{else}}'Password is required'{{/if}};
@@ -259,13 +269,21 @@ class SignupScreen extends HookWidget {
                 },
                 suffixIcon: IconButton(
                   icon: Icon(
+                    {{#if flags.usesIconsaxPlus}}
+                    obscurePassword.value ? IconsaxPlusLinear.eye_slash : IconsaxPlusLinear.eye,
+                    {{else if flags.usesFlutterRemix}}
+                    obscurePassword.value ? FlutterRemix.eye_off_line : FlutterRemix.eye_line,
+                    {{else if flags.usesHugeicons}}
+                    obscurePassword.value ? HugeIcons.strokeRoundedViewOff : HugeIcons.strokeRoundedView,
+                    {{else}}
                     obscurePassword.value ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                    {{/if}}
                     color: colorScheme.onSurfaceVariant,
                   ),
                   onPressed: () => obscurePassword.value = !obscurePassword.value,
                 ),
               ),
-              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.lg.h{{else}}AppSpacing.lg{{/if}}),
+              SizedBox(height: AppSpacing.lg.h),
               
               // Confirm Password Field
               AppTextField(
@@ -273,7 +291,17 @@ class SignupScreen extends HookWidget {
                 enabled: !isLoading,
                 hint: {{#if flags.supportsLocalization}}'auth.confirm_password'.tr(){{else}}'Confirm Password'{{/if}},
                 obscureText: obscureConfirmPassword.value,
-                prefixIcon: const Icon(Icons.lock_outline),
+                prefixIcon: const Icon(
+                  {{#if flags.usesIconsaxPlus}}
+                  IconsaxPlusLinear.lock,
+                  {{else if flags.usesFlutterRemix}}
+                  FlutterRemix.lock_line,
+                  {{else if flags.usesHugeicons}}
+                  HugeIcons.strokeRoundedLock01,
+                  {{else}}
+                  Icons.lock_outline,
+                  {{/if}}
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return {{#if flags.supportsLocalization}}'auth.confirm_password_required'.tr(){{else}}'Confirm password is required'{{/if}};
@@ -285,18 +313,26 @@ class SignupScreen extends HookWidget {
                 },
                 suffixIcon: IconButton(
                   icon: Icon(
+                    {{#if flags.usesIconsaxPlus}}
+                    obscureConfirmPassword.value ? IconsaxPlusLinear.eye_slash : IconsaxPlusLinear.eye,
+                    {{else if flags.usesFlutterRemix}}
+                    obscureConfirmPassword.value ? FlutterRemix.eye_off_line : FlutterRemix.eye_line,
+                    {{else if flags.usesHugeicons}}
+                    obscureConfirmPassword.value ? HugeIcons.strokeRoundedViewOff : HugeIcons.strokeRoundedView,
+                    {{else}}
                     obscureConfirmPassword.value ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                    {{/if}}
                     color: colorScheme.onSurfaceVariant,
                   ),
                   onPressed: () => obscureConfirmPassword.value = !obscureConfirmPassword.value,
                 ),
               ),
-              SizedBox(height: {{#if flags.usesScreenutil}}32.h{{else}}32{{/if}}),
+              SizedBox(height: 32.h),
               
               // Error Message
               if (errorMessage != null)
                 Padding(
-                  padding: {{#if flags.usesScreenutil}}EdgeInsets.only(bottom: AppSpacing.md.h){{else}}const EdgeInsets.only(bottom: AppSpacing.md){{/if}},
+                  padding: EdgeInsets.only(bottom: AppSpacing.md.h),
                   child: Text(
                     errorMessage!,
                     style: textTheme.bodyMedium?.copyWith(color: colorScheme.error),
@@ -313,7 +349,7 @@ class SignupScreen extends HookWidget {
                 height: ButtonSize.large,
                 isFullWidth: true,
               ),
-              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.xl.h{{else}}AppSpacing.xl{{/if}}),
+              SizedBox(height: AppSpacing.xl.h),
               
               // Sign In Link
               Center(
@@ -339,14 +375,14 @@ class SignupScreen extends HookWidget {
                   ),
                 ),
               ),
-              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.xl.h{{else}}AppSpacing.xl{{/if}}),
+              SizedBox(height: AppSpacing.xl.h),
               
               // Divider text
               Row(
                 children: [
                   const Expanded(child: AppDivider()),
                   Padding(
-                    padding: {{#if flags.usesScreenutil}}EdgeInsets.symmetric(horizontal: AppSpacing.md.w){{else}}const EdgeInsets.symmetric(horizontal: AppSpacing.md){{/if}},
+                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.md.w),
                     child: Text(
                       {{#if flags.supportsLocalization}}'auth.or_continue_with'.tr(){{else}}'Or Continue With Account'{{/if}},
                       style: textTheme.labelSmall?.copyWith(
@@ -358,7 +394,7 @@ class SignupScreen extends HookWidget {
                   const Expanded(child: AppDivider()),
                 ],
               ),
-              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.xl.h{{else}}AppSpacing.xl{{/if}}),
+              SizedBox(height: AppSpacing.xl.h),
               
               // Social Buttons
               Row(
@@ -369,20 +405,20 @@ class SignupScreen extends HookWidget {
                     iconData: Icons.facebook,
                     iconColor: const Color(0xFF1877F2),
                   ),
-                  SizedBox(width: {{#if flags.usesScreenutil}}AppSpacing.md.w{{else}}AppSpacing.md{{/if}}),
+                  SizedBox(width: AppSpacing.md.w),
                   // Emulate Google G icon using text for generic material 
                   _SocialButton(
                     onTap: () {},
                     child: Text(
                       'G',
                       style: TextStyle(
-                        fontSize: {{#if flags.usesScreenutil}}22.sp{{else}}22{{/if}},
+                        fontSize: 22.sp,
                         fontWeight: FontWeight.w900,
                         color: Colors.red, // normally multicolored, simplified here
                       ),
                     ),
                   ),
-                  SizedBox(width: {{#if flags.usesScreenutil}}AppSpacing.md.w{{else}}AppSpacing.md{{/if}}),
+                  SizedBox(width: AppSpacing.md.w),
                   _SocialButton(
                     onTap: () {},
                     iconData: Icons.apple,
@@ -390,7 +426,7 @@ class SignupScreen extends HookWidget {
                   ),
                 ],
               ),
-              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.xxl.h{{else}}AppSpacing.xxl{{/if}}),
+              SizedBox(height: AppSpacing.xxl.h),
             ],
           ),
           ),
@@ -419,8 +455,8 @@ class _SocialButton extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(50),
       child: Container(
-        height: {{#if flags.usesScreenutil}}48.h{{else}}48{{/if}},
-        width: {{#if flags.usesScreenutil}}48.w{{else}}48{{/if}},
+        height: 48.h,
+        width: 48.w,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           shape: BoxShape.circle,
@@ -436,7 +472,7 @@ class _SocialButton extends StatelessWidget {
         child: child ??
             Icon(
               iconData,
-              size: {{#if flags.usesScreenutil}}24.sp{{else}}24{{/if}},
+              size: 24.sp,
               color: iconColor,
             ),
       ),

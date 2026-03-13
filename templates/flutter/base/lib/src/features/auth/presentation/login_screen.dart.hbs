@@ -154,34 +154,12 @@ class LoginScreen extends HookWidget {
       backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: {{#if flags.usesScreenutil}}EdgeInsets.symmetric(horizontal: AppSpacing.lg.w){{else}}const EdgeInsets.symmetric(horizontal: AppSpacing.lg){{/if}},
+          padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg.w),
           child: Form(
             key: formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.md.h{{else}}AppSpacing.md{{/if}}),
-              // Back Button
-              Align(
-                alignment: Alignment.centerLeft,
-                child: InkWell(
-                  onTap: () {
-                    if (Navigator.canPop(context)) {
-                      Navigator.pop(context);
-                    }
-                  },
-                  borderRadius: BorderRadius.circular(50),
-                  child: Container(
-                    padding: {{#if flags.usesScreenutil}}EdgeInsets.all(AppSpacing.sm.w){{else}}const EdgeInsets.all(AppSpacing.sm){{/if}},
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
-                    ),
-                    child: Icon(Icons.arrow_back_ios_new, size: {{#if flags.usesScreenutil}}20.sp{{else}}20{{/if}}, color: colorScheme.onSurface),
-                  ),
-                ),
-              ),
-              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.xxl.h{{else}}AppSpacing.xxl{{/if}}),
+              SizedBox(height: AppSpacing.xxl.h),
               
               // Title
               Text(
@@ -190,25 +168,25 @@ class LoginScreen extends HookWidget {
                 style: textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                   color: colorScheme.onSurface,
-                  {{#if flags.usesScreenutil}}fontSize: 28.sp,{{/if}}
+                  fontSize: 28.sp,
                 ),
               ),
-              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.sm.h{{else}}AppSpacing.sm{{/if}}),
+              SizedBox(height: AppSpacing.sm.h),
               
               // Subtitle
               Padding(
-                padding: {{#if flags.usesScreenutil}}EdgeInsets.symmetric(horizontal: AppSpacing.lg.w){{else}}const EdgeInsets.symmetric(horizontal: AppSpacing.lg){{/if}},
+                padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg.w),
                 child: Text(
                   {{#if flags.supportsLocalization}}'auth.log_in_subtitle'.tr(){{else}}'Enter your email and password to securely access\nyour account and manage your services.'{{/if}},
                   textAlign: TextAlign.center,
                   style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                     height: 1.5,
-                    {{#if flags.usesScreenutil}}fontSize: 14.sp,{{/if}}
+                    fontSize: 14.sp,
                   ),
                 ),
               ),
-              SizedBox(height: {{#if flags.usesScreenutil}}40.h{{else}}40{{/if}}),
+              SizedBox(height: 40.h),
               
               // Email Field
               AppTextField(
@@ -216,18 +194,28 @@ class LoginScreen extends HookWidget {
                 enabled: !isLoading,
                 hint: {{#if flags.supportsLocalization}}'auth.email_address'.tr(){{else}}'Email address'{{/if}},
                 keyboardType: TextInputType.emailAddress,
-                prefixIcon: const Icon(Icons.email_outlined),
+                prefixIcon: const Icon(
+                  {{#if flags.usesIconsaxPlus}}
+                  IconsaxPlusLinear.sms,
+                  {{else if flags.usesFlutterRemix}}
+                  FlutterRemix.mail_line,
+                  {{else if flags.usesHugeicons}}
+                  HugeIcons.strokeRoundedMail01,
+                  {{else}}
+                  Icons.email_outlined,
+                  {{/if}}
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return {{#if flags.supportsLocalization}}'auth.email_required'.tr(){{else}}'Email is required'{{/if}};
                   }
-                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                  if (!value.isEmail) {
                     return {{#if flags.supportsLocalization}}'auth.email_invalid'.tr(){{else}}'Enter a valid email'{{/if}};
                   }
                   return null;
                 },
               ),
-              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.lg.h{{else}}AppSpacing.lg{{/if}}),
+              SizedBox(height: AppSpacing.md.h),
               
               // Password Field
               AppTextField(
@@ -235,7 +223,17 @@ class LoginScreen extends HookWidget {
                 enabled: !isLoading,
                 hint: {{#if flags.supportsLocalization}}'auth.password'.tr(){{else}}'Password'{{/if}},
                 obscureText: obscurePassword.value,
-                prefixIcon: const Icon(Icons.lock_outline),
+                prefixIcon: const Icon(
+                  {{#if flags.usesIconsaxPlus}}
+                  IconsaxPlusLinear.lock,
+                  {{else if flags.usesFlutterRemix}}
+                  FlutterRemix.lock_line,
+                  {{else if flags.usesHugeicons}}
+                  HugeIcons.strokeRoundedLock01,
+                  {{else}}
+                  Icons.lock_outline,
+                  {{/if}}
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return {{#if flags.supportsLocalization}}'auth.password_required'.tr(){{else}}'Password is required'{{/if}};
@@ -247,13 +245,21 @@ class LoginScreen extends HookWidget {
                 },
                 suffixIcon: IconButton(
                   icon: Icon(
+                    {{#if flags.usesIconsaxPlus}}
+                    obscurePassword.value ? IconsaxPlusLinear.eye_slash : IconsaxPlusLinear.eye,
+                    {{else if flags.usesFlutterRemix}}
+                    obscurePassword.value ? FlutterRemix.eye_off_line : FlutterRemix.eye_line,
+                    {{else if flags.usesHugeicons}}
+                    obscurePassword.value ? HugeIcons.strokeRoundedViewOff : HugeIcons.strokeRoundedView,
+                    {{else}}
                     obscurePassword.value ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                    {{/if}}
                     color: colorScheme.onSurfaceVariant,
                   ),
                   onPressed: () => obscurePassword.value = !obscurePassword.value,
                 ),
               ),
-              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.sm.h{{else}}AppSpacing.sm{{/if}}),
+              SizedBox(height: AppSpacing.sm.h),
               
               // Remember Me & Forgot Password
               Row(
@@ -286,19 +292,21 @@ class LoginScreen extends HookWidget {
                     child: Text(
                       {{#if flags.supportsLocalization}}'auth.forgot_password'.tr(){{else}}'Forgot Password'{{/if}},
                       style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurface,
+                        color: colorScheme.secondary.withValues(
+                            alpha: 0.6,
+                          ),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: {{#if flags.usesScreenutil}}32.h{{else}}32{{/if}}),
+              SizedBox(height: 32.h),
               
               // Error Message
               if (errorMessage != null)
                 Padding(
-                  padding: {{#if flags.usesScreenutil}}EdgeInsets.only(bottom: AppSpacing.md.h){{else}}const EdgeInsets.only(bottom: AppSpacing.md){{/if}},
+                  padding: EdgeInsets.only(bottom: AppSpacing.md.h),
                   child: Text(
                     errorMessage!,
                     style: textTheme.bodyMedium?.copyWith(color: colorScheme.error),
@@ -313,9 +321,10 @@ class LoginScreen extends HookWidget {
                 isLoading: isLoading,
                 variant: ButtonVariant.primary,
                 height: ButtonSize.large,
+                width: ButtonSize.large,
                 isFullWidth: true,
               ),
-              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.xl.h{{else}}AppSpacing.xl{{/if}}),
+              SizedBox(height: AppSpacing.xl.h),
               
               // Sign Up Link
               Center(
@@ -325,7 +334,9 @@ class LoginScreen extends HookWidget {
                     text: TextSpan(
                       text: {{#if flags.supportsLocalization}}'auth.dont_have_account'.tr(){{else}}'Don\'t have an account? '{{/if}},
                       style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+                        color: colorScheme.secondary.withValues(
+                            alpha: 0.6,
+                          ),
                         fontWeight: FontWeight.w500,
                       ),
                       children: [
@@ -341,14 +352,14 @@ class LoginScreen extends HookWidget {
                   ),
                 ),
               ),
-              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.xl.h{{else}}AppSpacing.xl{{/if}}),
+              SizedBox(height: AppSpacing.xl.h),
               
               // Divider text
               Row(
                 children: [
                   const Expanded(child: AppDivider()),
                   Padding(
-                    padding: {{#if flags.usesScreenutil}}EdgeInsets.symmetric(horizontal: AppSpacing.md.w){{else}}const EdgeInsets.symmetric(horizontal: AppSpacing.md){{/if}},
+                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.md.w),
                     child: Text(
                       {{#if flags.supportsLocalization}}'auth.or_continue_with'.tr(){{else}}'Or Continue With Account'{{/if}},
                       style: textTheme.labelSmall?.copyWith(
@@ -360,7 +371,7 @@ class LoginScreen extends HookWidget {
                   const Expanded(child: AppDivider()),
                 ],
               ),
-              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.xl.h{{else}}AppSpacing.xl{{/if}}),
+              SizedBox(height: AppSpacing.xl.h),
               
               // Social Buttons
               Row(
@@ -371,20 +382,20 @@ class LoginScreen extends HookWidget {
                     iconData: Icons.facebook,
                     iconColor: const Color(0xFF1877F2),
                   ),
-                  SizedBox(width: {{#if flags.usesScreenutil}}AppSpacing.md.w{{else}}AppSpacing.md{{/if}}),
+                  SizedBox(width: AppSpacing.md.w),
                   // Emulate Google G icon using text for generic material 
                   _SocialButton(
                     onTap: () {},
                     child: Text(
                       'G',
                       style: TextStyle(
-                        fontSize: {{#if flags.usesScreenutil}}22.sp{{else}}22{{/if}},
+                        fontSize: 22.sp,
                         fontWeight: FontWeight.w900,
                         color: Colors.red, // normally multicolored, simplified here
                       ),
                     ),
                   ),
-                  SizedBox(width: {{#if flags.usesScreenutil}}AppSpacing.md.w{{else}}AppSpacing.md{{/if}}),
+                  SizedBox(width: AppSpacing.md.w),
                   _SocialButton(
                     onTap: () {},
                     iconData: Icons.apple,
@@ -392,7 +403,7 @@ class LoginScreen extends HookWidget {
                   ),
                 ],
               ),
-              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.xxl.h{{else}}AppSpacing.xxl{{/if}}),
+              SizedBox(height: AppSpacing.xxl.h),
             ],
           ),
           ),
@@ -421,8 +432,8 @@ class _SocialButton extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(50),
       child: Container(
-        height: {{#if flags.usesScreenutil}}48.h{{else}}48{{/if}},
-        width: {{#if flags.usesScreenutil}}48.w{{else}}48{{/if}},
+        height: 48.h,
+        width: 48.w,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           shape: BoxShape.circle,
@@ -438,7 +449,7 @@ class _SocialButton extends StatelessWidget {
         child: child ??
             Icon(
               iconData,
-              size: {{#if flags.usesScreenutil}}24.sp{{else}}24{{/if}},
+              size: 24.sp,
               color: iconColor,
             ),
       ),

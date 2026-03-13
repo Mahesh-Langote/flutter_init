@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-{{#if flags.usesScreenutil}}
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-{{/if}}
 
 import '../../theme/app_borders.dart';
 import '../../theme/app_durations.dart';
@@ -52,28 +50,28 @@ class AppButton extends StatelessWidget {
     final isDisabled = onPressed == null || isLoading;
 
     final buttonHeight = switch (height) {
-      ButtonSize.small  => {{#if flags.usesScreenutil}}36.h{{else}}36.0{{/if}},
-      ButtonSize.medium => {{#if flags.usesScreenutil}}48.h{{else}}48.0{{/if}},
-      ButtonSize.large  => {{#if flags.usesScreenutil}}56.h{{else}}56.0{{/if}},
+      ButtonSize.small  => 36.h,
+      ButtonSize.medium => 48.h,
+      ButtonSize.large  => 56.h,
     };
 
     final buttonWidth = switch (width) {
-      ButtonSize.small  => {{#if flags.usesScreenutil}}100.w{{else}}100.0{{/if}},
-      ButtonSize.medium => {{#if flags.usesScreenutil}}150.w{{else}}150.0{{/if}},
-      ButtonSize.large  => {{#if flags.usesScreenutil}}200.w{{else}}200.0{{/if}},
+      ButtonSize.small  => 100.w,
+      ButtonSize.medium => 150.w,
+      ButtonSize.large  => 200.w,
       null              => null,
     };
 
     final horizontalPadding = switch (height) {
-      ButtonSize.small  => {{#if flags.usesScreenutil}}12.w{{else}}12.0{{/if}},
-      ButtonSize.medium => {{#if flags.usesScreenutil}}20.w{{else}}20.0{{/if}},
-      ButtonSize.large  => {{#if flags.usesScreenutil}}28.w{{else}}28.0{{/if}},
+      ButtonSize.small  => 12.w,
+      ButtonSize.medium => 20.w,
+      ButtonSize.large  => 28.w,
     };
 
     final fontSize = switch (height) {
-      ButtonSize.small  => {{#if flags.usesScreenutil}}12.sp{{else}}12.0{{/if}},
-      ButtonSize.medium => {{#if flags.usesScreenutil}}14.sp{{else}}14.0{{/if}},
-      ButtonSize.large  => {{#if flags.usesScreenutil}}16.sp{{else}}16.0{{/if}},
+      ButtonSize.small  => 12.sp,
+      ButtonSize.medium => 14.sp,
+      ButtonSize.large  => 16.sp,
     };
 
     final (bg, fg, border) = switch (variant) {

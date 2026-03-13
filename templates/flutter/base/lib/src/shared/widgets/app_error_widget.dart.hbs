@@ -1,5 +1,4 @@
-import '../../imports/core_imports.dart';
-import 'app_button.dart';
+import '../../imports/imports.dart';
 
 /// Displays an error state with an icon, title, optional body, and retry button.
 ///
@@ -17,7 +16,7 @@ class AppErrorWidget extends StatelessWidget {
     this.title = 'Something went wrong',
     this.message,
     this.onRetry,
-    this.icon = Icons.error_outline_rounded,
+    this.icon = {{#if flags.usesIconsaxPlus}}IconsaxPlusLinear.danger{{else if flags.usesFlutterRemix}}FlutterRemix.error_warning_line{{else if flags.usesHugeicons}}HugeIcons.strokeRoundedAlertCircle{{else}}Icons.error_outline_rounded{{/if}},
   });
 
   final String title;

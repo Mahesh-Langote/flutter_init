@@ -29,8 +29,8 @@ class CommonImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double? adjustedWidth = {{#if flags.usesScreenutil}}width?.w{{else}}width{{/if}};
-    final double? adjustedHeight = {{#if flags.usesScreenutil}}height?.h{{else}}height{{/if}};
+    final double? adjustedWidth = width?.w;
+    final double? adjustedHeight = height?.h;
 
     Widget image;
 

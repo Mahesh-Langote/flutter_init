@@ -23,33 +23,41 @@ class HomePage extends HookWidget {
       ),
       body: SafeArea(
         child: Padding(
-          padding: {{#if flags.usesScreenutil}}EdgeInsets.all(AppSpacing.xl.w){{else}}const EdgeInsets.all(AppSpacing.xl){{/if}},
+          padding: EdgeInsets.all(AppSpacing.xl.w),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Icon(
+                {{#if flags.usesIconsaxPlus}}
+                IconsaxPlusLinear.home,
+                {{else if flags.usesFlutterRemix}}
+                FlutterRemix.home_line,
+                {{else if flags.usesHugeicons}}
+                HugeIcons.strokeRoundedHome01,
+                {{else}}
                 Icons.home_rounded,
-                size: {{#if flags.usesScreenutil}}60.sp{{else}}60{{/if}},
+                {{/if}}
+                size: 60.sp,
                 color: colorScheme.primary,
               ),
-              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.lg.h{{else}}AppSpacing.lg{{/if}}),
+              SizedBox(height: AppSpacing.lg.h),
               Text(
                 {{#if flags.supportsLocalization}}'home.welcome_home'.tr(){{else}}'Welcome Home!'{{/if}},
                 textAlign: TextAlign.center,
                 style: textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.w900,
                   color: colorScheme.onSurface,
-                  {{#if flags.usesScreenutil}}fontSize: 28.sp,{{/if}}
+                  fontSize: 28.sp,
                 ),
               ),
-              SizedBox(height: {{#if flags.usesScreenutil}}AppSpacing.md.h{{else}}AppSpacing.md{{/if}}),
+              SizedBox(height: AppSpacing.md.h),
               Text(
                 {{#if flags.supportsLocalization}}'home.home_subtitle'.tr(){{else}}'You have successfully completed the onboarding process.'{{/if}},
                 textAlign: TextAlign.center,
                 style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
-                  {{#if flags.usesScreenutil}}fontSize: 14.sp,{{/if}}
+                  fontSize: 14.sp,
                 ),
               ),
             ],
