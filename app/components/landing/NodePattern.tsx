@@ -1,9 +1,16 @@
 "use client";
 
 import { Switch } from '@/components/ui/switch';
-import { Folder01Icon } from '@hugeicons/core-free-icons';
+import { 
+  Database01Icon, 
+  DashboardSquare01Icon, 
+  FireIcon, 
+  Folder01Icon, 
+  Unlink01Icon, 
+  Package01Icon, 
+  Route01Icon 
+} from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Database, Flame, Globe, Package, Route, LayoutDashboard } from 'lucide-react';
 import { useState } from 'react';
 
 export function NodePattern() {
@@ -42,7 +49,11 @@ export function NodePattern() {
             : 'bg-white/70 hover:bg-white/95 border-white/40 shadow-zinc-200/20'}
         `}>
           <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-[0.85rem] sm:rounded-xl flex items-center justify-center transition-all duration-300 border ${active ? bgClass + ' border-white/20 shadow-sm' : 'bg-zinc-100 border-zinc-200'}`}>
-            <Icon className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors duration-300 ${active ? 'text-white drop-shadow-sm' : 'text-zinc-400'}`} />
+            <HugeiconsIcon 
+              icon={Icon} 
+              size={20} 
+              className={`transition-colors duration-300 ${active ? 'text-white' : 'text-zinc-400'}`} 
+            />
           </div>
 
           <span className={`text-[13px] sm:text-[15px] font-bold ml-3 mr-8 transition-colors duration-300 ${active ? 'text-zinc-800' : 'text-zinc-500'}`}>
@@ -77,7 +88,7 @@ export function NodePattern() {
             <stop offset="80%" stopColor="currentColor" stopOpacity="0.3" />
             <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
           </linearGradient>
-          
+
           <filter id="glow">
             <feGaussianBlur stdDeviation="2" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
@@ -107,12 +118,12 @@ export function NodePattern() {
         </style>
 
         {/* Main Backbone - Greyish */}
-        <path 
-          d="M 0 200 L 800 200" 
+        <path
+          d="M 0 200 L 800 200"
           className="stroke-zinc-200 stroke-2"
         />
-        <path 
-          d="M 100 200 L 700 200" 
+        <path
+          d="M 100 200 L 700 200"
           className="stroke-zinc-200/ stroke-2 flow-line"
           filter="url(#glow)"
         />
@@ -121,16 +132,16 @@ export function NodePattern() {
         <g className="stroke-zinc-200 stroke-2">
           {/* GoRouter (Horizontal backbone) */}
           <path d="M 0 200 L 100 200" />
-          
+
           {/* Riverpod */}
-          <path 
-            d="M 320 200 C 260 200, 240 100, 180 100" 
+          <path
+            d="M 320 200 C 260 200, 240 100, 180 100"
             className="branch-path"
           />
           {/* Supabase */}
-          <path 
+          <path
             d="M 320 200 C 260 200, 240 280, 180 280"
-            className="branch-path" 
+            className="branch-path"
           />
         </g>
 
@@ -140,14 +151,14 @@ export function NodePattern() {
           <path d="M 700 200 L 800 200" />
 
           {/* Firebase */}
-          <path 
+          <path
             d="M 480 200 C 540 200, 560 120, 620 120"
             className="branch-path"
           />
           {/* Dio */}
-          <path 
+          <path
             d="M 480 200 C 540 200, 560 280, 610 280"
-            className="branch-path" 
+            className="branch-path"
           />
         </g>
 
@@ -160,11 +171,11 @@ export function NodePattern() {
           { cx: 0, cy: 200 },   // GoRouter
           { cx: 800, cy: 200 }  // Bloc
         ].map((dot, i) => (
-          <circle 
+          <circle
             key={i}
-            cx={dot.cx} 
-            cy={dot.cy} 
-            r="4" 
+            cx={dot.cx}
+            cy={dot.cy}
+            r="4"
             className="fill-primary"
             filter="url(#glow)"
           />
@@ -177,11 +188,11 @@ export function NodePattern() {
           {/* Multi-layered glow */}
           <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150 animate-pulse" />
           <div className="absolute inset-0 bg-primary/10 blur-xl rounded-full scale-125" />
-          
+
           <div className="relative w-24 h-24 sm:w-28 sm:h-28 bg-linear-to-tr from-primary via-primary/90 to-primary/80 rounded-[2rem] sm:rounded-[3rem] shadow-[0_25px_50px_-12px_hsl(var(--primary)/0.5)] flex items-center justify-center transform hover:scale-105 transition-all duration-500 border border-white/30 group overflow-hidden">
             {/* Glossy overlay */}
             <div className="absolute inset-0 bg-linear-to-br from-white/20 to-transparent pointer-events-none" />
-            
+
             <div className="relative animate-float">
               <HugeiconsIcon icon={Folder01Icon} size={48} color='#ffffff' className="sm:size-[56px] drop-shadow-lg" />
             </div>
@@ -210,42 +221,42 @@ export function NodePattern() {
         stateKey="goRouter"
         top="50%" left="0%"
         bgClass="bg-linear-to-tr from-rose-500 to-pink-400 shadow-rose-500/25"
-        Icon={Route}
+        Icon={Route01Icon}
         label="GoRouter"
       />
       <NodeSwitch
         stateKey="riverpod"
         top="25%" left="22.5%"
         bgClass="bg-linear-to-tr from-blue-600 to-blue-400 shadow-blue-500/25"
-        Icon={LayoutDashboard}
+        Icon={DashboardSquare01Icon}
         label="Riverpod"
       />
       <NodeSwitch
         stateKey="supabase"
         top="70%" left="22.5%"
         bgClass="bg-linear-to-tr from-emerald-500 to-green-400 shadow-emerald-500/25"
-        Icon={Database}
+        Icon={Database01Icon}
         label="Supabase"
       />
       <NodeSwitch
         stateKey="firebase"
         top="30%" left="77.5%"
         bgClass="bg-linear-to-tr from-orange-500 to-amber-400 shadow-orange-500/25"
-        Icon={Flame}
+        Icon={FireIcon}
         label="Firebase"
       />
       <NodeSwitch
         stateKey="bloc"
         top="50%" left="100%"
         bgClass="bg-linear-to-tr from-indigo-500 to-purple-400 shadow-indigo-500/25"
-        Icon={Package}
+        Icon={Package01Icon}
         label="Bloc"
       />
       <NodeSwitch
         stateKey="dio"
         top="70%" left="76.25%"
         bgClass="bg-linear-to-tr from-cyan-500 to-sky-400 shadow-cyan-500/25"
-        Icon={Globe}
+        Icon={Unlink01Icon}
         label="Dio"
       />
 

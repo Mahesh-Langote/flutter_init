@@ -1,9 +1,17 @@
 "use client"
-import { useState } from 'react';
-import { Github, Heart, Mail, XIcon, Linkedin, Check } from 'lucide-react';
-import { toast } from 'sonner';
+import { 
+  CheckmarkCircle01Icon, 
+  FavouriteIcon, 
+  GithubIcon, 
+  Linkedin01Icon, 
+  Mail01Icon, 
+  NewTwitterIcon 
+} from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import Image from "next/image";
 import Link from 'next/link';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -48,21 +56,21 @@ export function Footer() {
               aria-label="View Flutter Init on GitHub"
               className="p-2 rounded-xl bg-zinc-50 border border-zinc-100 text-zinc-600 hover:text-primary hover:border-primary/20 hover:bg-primary/5 transition-all duration-300"
             >
-              <Github className="w-5 h-5" />
+              <HugeiconsIcon icon={GithubIcon} size={20} />
             </Link>
             <Link
               href="https://www.linkedin.com/in/arjun-mahar-6067951b8"
               aria-label="Follow Arjun on LinkedIn"
               className="p-2 rounded-xl bg-zinc-50 border border-zinc-100 text-zinc-600 hover:text-primary hover:border-primary/20 hover:bg-primary/5 transition-all duration-300"
             >
-              <Linkedin className="w-5 h-5" />
+              <HugeiconsIcon icon={Linkedin01Icon} size={20} />
             </Link>
             <Link
               href="https://x.com/arjun_mahar1"
               aria-label="Follow Arjun on X (Twitter)"
               className="p-2 rounded-xl bg-zinc-50 border border-zinc-100 text-zinc-600 hover:text-primary hover:border-primary/20 hover:bg-primary/5 transition-all duration-300"
             >
-              <XIcon className="w-5 h-5" />
+              <HugeiconsIcon icon={NewTwitterIcon} size={20} />
             </Link>
             <button
               onClick={handleCopyEmail}
@@ -71,9 +79,9 @@ export function Footer() {
               title="Copy email"
             >
               {copied ? (
-                <Check className="w-5 h-5 text-emerald-500" />
+                <HugeiconsIcon icon={CheckmarkCircle01Icon} size={20} className="text-emerald-500" />
               ) : (
-                <Mail className="w-5 h-5" />
+                <HugeiconsIcon icon={Mail01Icon} size={20} />
               )}
             </button>
           </div>
@@ -85,7 +93,7 @@ export function Footer() {
           <div className="flex items-center gap-2 text-zinc-500 font-medium text-sm">
             <span>© {currentYear} FlutterInit.</span>
             <span className="hidden md:inline">Built with</span>
-            <Heart className="w-4 h-4 text-rose-500 fill-rose-500 animate-pulse" />
+            <HugeiconsIcon icon={FavouriteIcon} size={16} className="text-rose-500 fill-rose-500 animate-pulse" />
             <span>by</span>
             <Link
               href="https://github.com/Arjun544"
@@ -96,12 +104,12 @@ export function Footer() {
             </Link>
           </div>
 
-          
-            <div className="flex items-center gap-2 text-[13px] font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Fully Open Source
-            </div>
+
+          <div className="flex items-center gap-2 text-[13px] font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            Fully Open Source
           </div>
+        </div>
       </div>
 
       {/* Subtle bottom glow */}

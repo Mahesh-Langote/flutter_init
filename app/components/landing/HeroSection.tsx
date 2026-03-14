@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Terminal } from 'lucide-react';
+import { ArrowRight01Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import Link from 'next/link';
 import { NodePattern } from './NodePattern';
 import { MobileNodePattern } from './MobileNodePattern';
@@ -46,7 +47,11 @@ export function HeroSection() {
             <Link href="/create">
               Start Generating
               <div className="ml-3 flex items-center justify-center w-6 h-6 rounded-full bg-zinc-800 group-hover:bg-zinc-700 transition-colors">
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                <HugeiconsIcon 
+                  icon={ArrowRight01Icon} 
+                  size={14} 
+                  className="group-hover:translate-x-0.5 transition-transform" 
+                />
               </div>
             </Link>
           </Button>

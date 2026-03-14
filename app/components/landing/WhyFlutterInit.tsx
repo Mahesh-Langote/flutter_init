@@ -1,12 +1,20 @@
 import { cn } from '@/lib/utils';
-import { Clock, Cpu, Layers, LayoutDashboard, Shield, Zap } from 'lucide-react';
+import { 
+  Clock01Icon, 
+  CpuIcon, 
+  DashboardSquare01Icon, 
+  FlashIcon, 
+  Layers01Icon, 
+  Shield01Icon 
+} from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 
 export function WhyFlutterInit() {
   const features = [
     {
       title: "Architecture Agnostic",
       description: "Clean Architecture, MVVM, or MVC. FlutterInit adapts to your team's workflow, providing the perfect structure every time.",
-      icon: <Layers className="w-6 h-6 text-primary" />,
+      icon: <HugeiconsIcon icon={Layers01Icon} size={24} className="text-primary" />,
       className: "md:col-span-2 md:row-span-1",
       gradient: "from-primary/10 via-primary/5 to-transparent",
       pattern: true,
@@ -16,7 +24,7 @@ export function WhyFlutterInit() {
     {
       title: "Zero Boilerplate",
       description: "Skip the 4-hour setup. Focus on features.",
-      icon: <Zap className="w-6 h-6 text-amber-500" />,
+      icon: <HugeiconsIcon icon={FlashIcon} size={24} className="text-amber-500" />,
       className: "md:col-span-1 md:row-span-1",
       gradient: "from-amber-500/10 to-transparent",
       hoverBg: "group-hover:bg-amber-500/10",
@@ -25,7 +33,7 @@ export function WhyFlutterInit() {
     {
       title: "Production Ready",
       description: "Enterprise-grade logging, error handling, and monitoring built into the core. Scale with confidence.",
-      icon: <Shield className="w-6 h-6 text-emerald-500" />,
+      icon: <HugeiconsIcon icon={Shield01Icon} size={24} className="text-emerald-500" />,
       className: "md:col-span-1 md:row-span-2",
       gradient: "from-emerald-500/10 to-transparent",
       vertical: true,
@@ -35,7 +43,7 @@ export function WhyFlutterInit() {
     {
       title: "Optimized Performance",
       description: "Lightweight scaffolds following best practices for 60fps animations.",
-      icon: <Cpu className="w-6 h-6 text-indigo-500" />,
+      icon: <HugeiconsIcon icon={CpuIcon} size={24} className="text-indigo-500" />,
       className: "md:col-span-1 md:row-span-1",
       gradient: "from-indigo-500/10 to-transparent",
       hoverBg: "group-hover:bg-indigo-500/10",
@@ -44,7 +52,7 @@ export function WhyFlutterInit() {
     {
       title: "Modern Tech Stack",
       description: "Riverpod, Bloc, GoRouter, and Material 3 design tokens pre-integrated.",
-      icon: <LayoutDashboard className="w-6 h-6 text-blue-500" />,
+      icon: <HugeiconsIcon icon={DashboardSquare01Icon} size={24} className="text-blue-500" />,
       className: "md:col-span-1 md:row-span-1",
       gradient: "from-blue-500/10 to-transparent",
       hoverBg: "group-hover:bg-blue-500/10",
@@ -53,7 +61,7 @@ export function WhyFlutterInit() {
     {
       title: "Rapid Prototyping",
       description: "From idea to running app in under 60 seconds. The faster way to ship Flutter applications to production.",
-      icon: <Clock className="w-6 h-6 text-rose-500" />,
+      icon: <HugeiconsIcon icon={Clock01Icon} size={24} className="text-rose-500" />,
       className: "md:col-span-2 md:row-span-1",
       gradient: "from-rose-500/10 to-transparent",
       pattern: true,

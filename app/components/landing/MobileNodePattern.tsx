@@ -1,9 +1,16 @@
 "use client";
 
 import { Switch } from '@/components/ui/switch';
-import { Folder01Icon } from '@hugeicons/core-free-icons';
+import { 
+  Database01Icon, 
+  FireIcon, 
+  Folder01Icon, 
+  Unlink01Icon, 
+  Package01Icon, 
+  Route01Icon, 
+  WaveIcon 
+} from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Database, Flame, Globe, Package, Route, Waves } from 'lucide-react';
 import { useState } from 'react';
 
 export function MobileNodePattern() {
@@ -42,7 +49,7 @@ export function MobileNodePattern() {
             : 'bg-white/70 hover:bg-white/95 border-white/40 shadow-zinc-200/20'}
         `}>
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 border ${active ? bgClass + ' border-white/20 shadow-sm' : 'bg-zinc-100 border-zinc-200'}`}>
-            <Icon className={`w-5 h-5 transition-colors duration-300 ${active ? 'text-white drop-shadow-sm' : 'text-zinc-400'}`} />
+            <HugeiconsIcon icon={Icon} size={20} className={`transition-colors duration-300 ${active ? 'text-white' : 'text-zinc-400'}`} />
           </div>
 
           <span className={`text-[13px] font-bold ml-3 mr-4 transition-colors duration-300 ${active ? 'text-zinc-800' : 'text-zinc-500'}`}>
@@ -168,21 +175,21 @@ export function MobileNodePattern() {
         stateKey="riverpod"
         top="100px" left="100px"
         bgClass="bg-linear-to-tr from-blue-600 to-blue-400 shadow-blue-500/25"
-        Icon={Waves}
+        Icon={WaveIcon}
         label="Riverpod"
       />
       <NodeSwitch
         stateKey="supabase"
         top="100px" left="300px"
         bgClass="bg-linear-to-tr from-emerald-500 to-green-400 shadow-emerald-500/25"
-        Icon={Database}
+        Icon={Database01Icon}
         label="Supabase"
       />
       <NodeSwitch
         stateKey="goRouter"
         top="200px" left="200px"
         bgClass="bg-linear-to-tr from-rose-500 to-pink-400 shadow-rose-500/25"
-        Icon={Route}
+        Icon={Route01Icon}
         label="GoRouter"
       />
 
@@ -191,21 +198,21 @@ export function MobileNodePattern() {
         stateKey="bloc"
         top="450px" left="200px"
         bgClass="bg-linear-to-tr from-indigo-500 to-purple-400 shadow-indigo-500/25"
-        Icon={Package}
+        Icon={Package01Icon}
         label="Bloc"
       />
       <NodeSwitch
         stateKey="firebase"
         top="550px" left="100px"
         bgClass="bg-linear-to-tr from-orange-500 to-amber-400 shadow-orange-500/25"
-        Icon={Flame}
+        Icon={FireIcon}
         label="Firebase"
       />
       <NodeSwitch
         stateKey="dio"
         top="550px" left="300px"
         bgClass="bg-linear-to-tr from-cyan-500 to-sky-400 shadow-cyan-500/25"
-        Icon={Globe}
+        Icon={Unlink01Icon}
         label="Dio"
       />
     </div>
