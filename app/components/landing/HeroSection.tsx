@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Terminal } from 'lucide-react';
 import Link from 'next/link';
 import { NodePattern } from './NodePattern';
+import { MobileNodePattern } from './MobileNodePattern';
 import { GitHubStars, GitHubStarsSkeleton } from './GitHubStars';
 import { Suspense } from 'react';
 
@@ -10,7 +11,7 @@ export function HeroSection() {
     <section className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-white">
       {/* Premium background grid - softer and atmospheric */}
       <div
-        className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:64px_64px]"
+        className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-size-[64px_64px]"
         style={{
           maskImage: 'linear-gradient(to_bottom, black 10%, transparent 80%)',
           WebkitMaskImage: 'linear-gradient(to_bottom, black 10%, transparent 80%)'
@@ -55,7 +56,12 @@ export function HeroSection() {
           </Suspense>
         </div>
         {/* Branching Visual Nodes - Now taking visual priority at the top */}
-        <NodePattern />
+        <div className="hidden sm:block w-full">
+          <NodePattern />
+        </div>
+        <div className="block sm:hidden w-full">
+          <MobileNodePattern />
+        </div>
 
       </div>
     </section>
