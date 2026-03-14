@@ -1,0 +1,16 @@
+{
+  "name": "Flutter Init",
+  "short_name": "FlutterInit",
+  "description": "The High-Performance Scaffolding Engine for Modern Flutter Apps.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

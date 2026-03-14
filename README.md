@@ -38,25 +38,6 @@
 
 ---
 
-## 🧩 Modular Ecosystem
-
-Flutter Init supports a wide array of industry-standard patterns. Pick your stack, and we handle the integration.
-
-<div align="center">
-  <table border="0">
-    <tr>
-      <td align="center" width="16.6%"><img src="https://raw.githubusercontent.com/rrousselGit/riverpod/master/resources/riverpod.png" width="40" /><br/><b>Riverpod</b></td>
-      <td align="center" width="16.6%"><img src="https://raw.githubusercontent.com/felangel/bloc/master/docs/assets/bloc_logo_full.png" width="40" /><br/><b>Bloc</b></td>
-      <td align="center" width="16.6%"><img src="https://firebase.google.com/downloads/brand-guidelines/PNG/logo-logomark.png" width="40" /><br/><b>Firebase</b></td>
-      <td align="center" width="16.6%"><img src="https://supabase.com/dashboard/img/supabase-logo.png" width="40" /><br/><b>Supabase</b></td>
-      <td align="center" width="16.6%"><img src="https://raw.githubusercontent.com/fluttercommunity/get_it/master/logo.png" width="40" /><br/><b>GetIt</b></td>
-      <td align="center" width="16.6%"><img src="https://raw.githubusercontent.com/cfug/dio/main/dio.png" width="40" /><br/><b>Dio</b></td>
-    </tr>
-  </table>
-</div>
-
----
-
 ## ✨ Features (Elevated)
 
 <table border="0">
@@ -114,7 +95,7 @@ npm run dev
 This repository is built on the principle of **Contribution Based Evolution**. We don't just want users; we want architects.
 
 - **Submit Patterns**: Add your favorite architectural patterns to our `templates/` directory.
-- **Refine the Core**: Improve the CLI performance or Web Dashboard UI.
+- **Refine the Core**: Improve the Web Dashboard UI.
 - **Documentation**: Help us make the onboarding experience even smoother.
 
 > [!TIP]

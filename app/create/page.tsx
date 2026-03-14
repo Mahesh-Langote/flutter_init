@@ -1,6 +1,12 @@
 import { WizardShell } from "@/app/components/wizard/WizardShell"
 import { WizardProvider } from "@/app/lib/state/useWizardStore"
 import Image from "next/image"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Create Your Project",
+  description: "Configure and generate your custom Flutter project scaffold in seconds. Choose your architecture, state management, and more.",
+};
 
 export default function CreatePage() {
     return (

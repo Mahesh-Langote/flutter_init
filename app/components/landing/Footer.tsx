@@ -45,24 +45,28 @@ export function Footer() {
             <Link
               href="https://github.com/Arjun544/flutter_init"
               target="_blank"
+              aria-label="View Flutter Init on GitHub"
               className="p-2 rounded-xl bg-zinc-50 border border-zinc-100 text-zinc-600 hover:text-primary hover:border-primary/20 hover:bg-primary/5 transition-all duration-300"
             >
               <Github className="w-5 h-5" />
             </Link>
             <Link
               href="https://www.linkedin.com/in/arjun-mahar-6067951b8"
+              aria-label="Follow Arjun on LinkedIn"
               className="p-2 rounded-xl bg-zinc-50 border border-zinc-100 text-zinc-600 hover:text-primary hover:border-primary/20 hover:bg-primary/5 transition-all duration-300"
             >
               <Linkedin className="w-5 h-5" />
             </Link>
             <Link
               href="https://x.com/arjun_mahar1"
+              aria-label="Follow Arjun on X (Twitter)"
               className="p-2 rounded-xl bg-zinc-50 border border-zinc-100 text-zinc-600 hover:text-primary hover:border-primary/20 hover:bg-primary/5 transition-all duration-300"
             >
               <XIcon className="w-5 h-5" />
             </Link>
             <button
               onClick={handleCopyEmail}
+              aria-label="Copy contact email"
               className="p-2 rounded-xl bg-zinc-50 border border-zinc-100 text-zinc-600 hover:text-primary hover:border-primary/20 hover:bg-primary/5 transition-all duration-300 cursor-pointer relative group"
               title="Copy email"
             >
