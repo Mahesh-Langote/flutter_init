@@ -46,6 +46,10 @@ const steps: Record<
         title: "Localization",
         description: "Setup easily with easy_localization.",
     },
+    misc: {
+        title: "Miscellaneous",
+        description: "Configure additional packages and settings.",
+    },
     generate: {
         title: "Generate",
         description: "Review choices and download the scaffold.",

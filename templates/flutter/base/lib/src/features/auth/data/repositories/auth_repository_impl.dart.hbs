@@ -1,78 +1,40 @@
-import '../../../../utils/utils.dart';
+import '../../../../imports/imports.dart';
 import '../../domain/models/user_model.dart';
 import '../../domain/repositories/auth_repository.dart';
 
-{{#if (eq backend.provider "firebase")}}
-import 'package:firebase_auth/firebase_auth.dart' as fb;
-{{else if (eq backend.provider "supabase")}}
-import 'package:supabase_flutter/supabase_flutter.dart' as sp;
-{{else}}
-{{#if flags.usesDio}}
-import 'package:dio/dio.dart';
-{{else if flags.usesHttp}}
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-{{/if}}
-{{/if}}
-
 class AuthRepositoryImpl implements AuthRepository {
-  {{#if (eq backend.provider "firebase")}}
-  final fb.FirebaseAuth _firebaseAuth = fb.FirebaseAuth.instance;
-  {{else if (eq backend.provider "supabase")}}
-  final sp.SupabaseClient _supabaseClient = sp.Supabase.instance.client;
-  {{else}}
-  {{#if flags.usesDio}}
-  final Dio _dio = Dio(BaseOptions(baseUrl: const String.fromEnvironment('API_URL', defaultValue: 'https://api.example.com')));
-  {{else if flags.usesHttp}}
-  final String _baseUrl = const String.fromEnvironment('API_URL', defaultValue: 'https://api.example.com');
-  {{/if}}
-  {{/if}}
+  final AuthService _authService = AuthService.instance;
 
   @override
   FutureEither<AppUser> login({
     required String email, 
     required String password,
-  }) {
-    return runTask(
-      () async {
-      {{#if (eq backend.provider "firebase")}}
-      final cred = await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
-      final user = cred.user;
-      if (user == null) throw Exception('Login failed: User record not found');
-      return AppUser(id: user.uid, email: user.email ?? email, name: user.displayName, photoUrl: user.photoURL);
-      
-      {{else if (eq backend.provider "supabase")}}
-      final response = await _supabaseClient.auth.signInWithPassword(email: email, password: password);
-      final user = response.user;
-      if (user == null) throw Exception('Login failed: User record not found');
-      return AppUser(id: user.id, email: user.email ?? email, name: user.userMetadata?['name'] as String?);
-      
-      {{else}}
-      {{#if flags.usesDio}}
-      final response = await _dio.post('/auth/login', data: {'email': email, 'password': password});
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw Exception(response.data?['message'] ?? 'Invalid credentials');
+  }) async {
+    final result = await _authService.login(email: email, password: password);
+    
+    return result.flatMap((userData) {
+      if (userData == null) {
+        return left(const ServerFailure('Login failed: User record not found'));
       }
-      final data = response.data['user'];
-      return AppUser(id: data['id'].toString(), email: data['email'], name: data['name']);
-      {{else if flags.usesHttp}}
-      final response = await http.post(
-        Uri.parse('$_baseUrl/auth/login'), 
-        body: jsonEncode({'email': email, 'password': password}),
-        headers: {'Content-Type': 'application/json'},
+
+      {{#if (or (eq backend.provider "firebase") (eq backend.provider "supabase"))}}
+      final user = AppUser(
+        id: userData['id'], 
+        email: userData['email'] ?? email, 
+        name: userData['name'],
+        photoUrl: userData['photoUrl'],
       );
-      if (response.statusCode != 200 && response.statusCode != 201) throw Exception('Invalid credentials');
-      final data = jsonDecode(response.body)['user'];
-      return AppUser(id: data['id'].toString(), email: data['email'], name: data['name']);
       {{else}}
-      await Future.delayed(const Duration(seconds: 2));
-      if (password.length < 6) throw Exception('Invalid credentials');
-      return AppUser(id: 'mock_123', email: email, name: 'Mock User');
+      final data = userData['user'] ?? userData;
+      final user = AppUser(
+        id: data['id'].toString(), 
+        email: data['email'] ?? email, 
+        name: data['name'],
+      );
       {{/if}}
-      {{/if}}
-      },
-      requiresNetwork: true,
-    );
+      
+      return right(user);
+    });
   }
 
   @override
@@ -80,133 +42,60 @@ class AuthRepositoryImpl implements AuthRepository {
     required String name, 
     required String email, 
     required String password,
-  }) {
-    return runTask(
-      () async {
-      {{#if (eq backend.provider "firebase")}}
-      final cred = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
-      final user = cred.user;
-      if (user == null) throw Exception('Sign up failed: User record corrupted');
-      await user.updateDisplayName(name);
-      return AppUser(id: user.uid, email: user.email ?? email, name: name, photoUrl: user.photoURL);
-      
-      {{else if (eq backend.provider "supabase")}}
-      final response = await _supabaseClient.auth.signUp(
-        email: email, 
-        password: password, 
-        data: {'name': name},
-      );
-      final user = response.user;
-      if (user == null) throw Exception('Sign up failed');
-      return AppUser(id: user.id, email: user.email ?? email, name: name);
-      
-      {{else}}
-      {{#if flags.usesDio}}
-      final response = await _dio.post('/auth/signup', data: {'name': name, 'email': email, 'password': password});
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw Exception(response.data?['message'] ?? 'Sign up failed');
-      }
-      final data = response.data['user'];
-      return AppUser(id: data['id'].toString(), email: data['email'], name: data['name']);
-      {{else if flags.usesHttp}}
-      final response = await http.post(
-        Uri.parse('$_baseUrl/auth/signup'), 
-        body: jsonEncode({'name': name, 'email': email, 'password': password}),
-        headers: {'Content-Type': 'application/json'},
-      );
-      if (response.statusCode != 200 && response.statusCode != 201) throw Exception('Sign up failed');
-      final data = jsonDecode(response.body)['user'];
-      return AppUser(id: data['id'].toString(), email: data['email'], name: data['name']);
-      {{else}}
-      await Future.delayed(const Duration(seconds: 2));
-      return AppUser(id: 'mock_123', email: email, name: name);
-      {{/if}}
-      {{/if}}
-      },
-      requiresNetwork: true,
+  }) async {
+    final result = await _authService.signUp(
+      name: name,
+      email: email,
+      password: password,
     );
+
+    return result.flatMap((userData) {
+      if (userData == null) {
+        return left(const ServerFailure('Sign up failed: User record corrupted'));
+      }
+
+      {{#if (or (eq backend.provider "firebase") (eq backend.provider "supabase"))}}
+      final user = AppUser(
+        id: userData['id'], 
+        email: userData['email'] ?? email, 
+        name: name,
+      );
+      {{else}}
+      final data = userData['user'] ?? userData;
+      final user = AppUser(
+        id: data['id'].toString(), 
+        email: data['email'] ?? email, 
+        name: name,
+      );
+      {{/if}}
+      
+      return right(user);
+    });
   }
 
   @override
   FutureEither<void> forgotPassword({required String email}) {
-    return runTask(
-      () async {
-      {{#if (eq backend.provider "firebase")}}
-      await _firebaseAuth.sendPasswordResetEmail(email: email);
-      {{else if (eq backend.provider "supabase")}}
-      await _supabaseClient.auth.resetPasswordForEmail(email);
-      {{else}}
-      {{#if flags.usesDio}}
-      final response = await _dio.post('/auth/forgot-password', data: {'email': email});
-      if (response.statusCode != 200 && response.statusCode != 201) throw Exception('Failed to send reset email');
-      {{else if flags.usesHttp}}
-      final response = await http.post(
-        Uri.parse('$_baseUrl/auth/forgot-password'), 
-        body: jsonEncode({'email': email}),
-        headers: {'Content-Type': 'application/json'},
-      );
-      if (response.statusCode != 200 && response.statusCode != 201) throw Exception('Failed to send reset email');
-      {{else}}
-      await Future.delayed(const Duration(seconds: 2));
-      {{/if}}
-      {{/if}}
-      },
-      requiresNetwork: true,
-    );
+    return _authService.forgotPassword(email: email);
   }
 
   @override
   FutureEither<void> logout() {
-    return runTask(
-      () async {
-      {{#if (eq backend.provider "firebase")}}
-      await _firebaseAuth.signOut();
-      {{else if (eq backend.provider "supabase")}}
-      await _supabaseClient.auth.signOut();
-      {{else}}
-      {{#if flags.usesDio}}
-      // Perform API logout if necessary, or simply clear tokens natively later
-      await _dio.post('/auth/logout').catchError((_) => Response(requestOptions: RequestOptions(path: '')));
-      {{else if flags.usesHttp}}
-      await http.post(Uri.parse('$_baseUrl/auth/logout'), headers: {'Content-Type': 'application/json'}).catchError((_) => http.Response('', 200));
-      {{else}}
-      await Future.delayed(const Duration(seconds: 1));
-      {{/if}}
-      {{/if}}
-      },
-      requiresNetwork: true,
-    );
+    return _authService.logout();
   }
 
   @override
-  FutureEither<AppUser?> checkAuthState() {
-    return runTask(
-      () async {
-      {{#if (eq backend.provider "firebase")}}
-      final user = _firebaseAuth.currentUser;
-      if (user == null) return null;
-      return AppUser(id: user.uid, email: user.email ?? '', name: user.displayName, photoUrl: user.photoURL);
-      {{else if (eq backend.provider "supabase")}}
-      final session = _supabaseClient.auth.currentSession;
-      if (session == null || session.user == null) return null;
-      final user = session.user!;
-      return AppUser(id: user.id, email: user.email ?? '', name: user.userMetadata?['name'] as String?);
-      {{else}}
-      // With REST, normally you extract JWT token securely, then hit '/auth/me'
-      // Requires SecureStorage check here natively
-      {{#if flags.usesDio}}
-      // Example implementation: Return null if token is missing securely (to be written logic config side)
-      // For now:
-      return null;
-      {{else if flags.usesHttp}}
-      return null;
-      {{else}}
-      await Future.delayed(const Duration(seconds: 1));
-      return null; // Force login naturally during debug
-      {{/if}}
-      {{/if}}
-      },
-      requiresNetwork: true,
-    );
+  FutureEither<AppUser?> checkAuthState() async {
+    final result = await _authService.getCurrentUser();
+    
+    return result.map((userData) {
+      if (userData == null) return null;
+
+      return AppUser(
+        id: userData['id'], 
+        email: userData['email'] ?? '', 
+        name: userData['name'],
+        photoUrl: userData['photoUrl'],
+      );
+    });
   }
 }

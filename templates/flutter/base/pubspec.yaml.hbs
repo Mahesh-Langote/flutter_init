@@ -28,10 +28,14 @@ dependencies:
   # State Management
   fpdart: ^1.2.0
   equatable: ^2.0.7
+  {{#if flags.usesFlutterHooks}}
   flutter_hooks: ^0.20.5
+  {{/if}}
   {{#if flags.isRiverpod}}
   flutter_riverpod: ^2.6.1
+  {{#if flags.usesFlutterHooks}}
   hooks_riverpod: ^2.6.1
+  {{/if}}
   {{/if}}
   {{#if flags.isProvider}}
   provider: ^6.1.5+1
@@ -117,12 +121,12 @@ dependencies:
   {{/if}}
 
   # Responsive UI
+  {{#if flags.usesScreenutil}}
   flutter_screenutil: ^5.9.3
+  {{/if}}
 
   # Animations
-  {{#if flags.usesAnimate}}
   flutter_animate: ^4.5.2
-  {{/if}}
   smooth_page_indicator: ^2.0.1
 
   # Environment
@@ -134,6 +138,37 @@ dependencies:
   {{#if flags.usesLogger}}
   logger: ^2.6.2
   {{/if}}
+
+  # Media
+  {{#if flags.usesImagePicker}}
+  image_picker: ^1.2.1
+  {{/if}}
+  {{#if flags.usesFilePicker}}
+  file_picker: ^10.3.10
+  {{/if}}
+
+  # Utilities
+  {{#if flags.usesPathProvider}}
+  path_provider: ^2.1.4
+  {{/if}}
+  {{#if flags.usesUrlLauncher}}
+  url_launcher: ^6.3.1
+  {{/if}}
+  {{#if flags.usesSharePlus}}
+  share_plus: ^10.1.4
+  {{/if}}
+  {{#if flags.usesPermissionHandler}}
+  permission_handler: ^12.0.1
+  {{/if}}
+
+  # Device & System
+  {{#if flags.usesDeviceInfoPlus}}
+  device_info_plus: ^11.2.0
+  {{/if}}
+  {{#if flags.usesAppVersionUpdate}}
+  app_version_update: ^6.2.0
+  {{/if}}
+
 
   # Localization
   {{#if flags.supportsLocalization}}

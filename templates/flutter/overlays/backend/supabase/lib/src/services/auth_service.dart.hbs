@@ -1,13 +1,74 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import '../utils/utils.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as sp;
 
 class AuthService {
-AuthService(this.client);
+  AuthService._();
+  static final AuthService instance = AuthService._();
 
-final SupabaseClient client;
+  final sp.SupabaseClient _supabaseClient = sp.Supabase.instance.client;
 
-Future<AuthResponse> signInWithEmail(String email, String password) {
-    return client.auth.signInWithPassword(email: email, password: password);
-    }
+  FutureEither<Map<String, dynamic>?> login({
+    required String email,
+    required String password,
+  }) async {
+    return runTask(() async {
+      final response = await _supabaseClient.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+      final user = response.user;
+      if (user == null) return null;
+      return {
+        'id': user.id,
+        'email': user.email,
+        'name': user.userMetadata?['name'],
+      };
+    }, requiresNetwork: true);
+  }
 
-    Future<void> signOut() => client.auth.signOut();
-        }
+  FutureEither<Map<String, dynamic>?> signUp({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    return runTask(() async {
+      final response = await _supabaseClient.auth.signUp(
+        email: email,
+        password: password,
+        data: {'name': name},
+      );
+      final user = response.user;
+      if (user == null) return null;
+      return {
+        'id': user.id,
+        'email': user.email,
+        'name': name,
+      };
+    }, requiresNetwork: true);
+  }
+
+  FutureEither<void> forgotPassword({required String email}) async {
+    return runTask(() async {
+      await _supabaseClient.auth.resetPasswordForEmail(email);
+    }, requiresNetwork: true);
+  }
+
+  FutureEither<void> logout() async {
+    return runTask(() async {
+      await _supabaseClient.auth.signOut();
+    }, requiresNetwork: true);
+  }
+
+  FutureEither<Map<String, dynamic>?> getCurrentUser() async {
+    return runTask(() async {
+      final session = _supabaseClient.auth.currentSession;
+      if (session == null) return null;
+      final user = session.user;
+      return {
+        'id': user.id,
+        'email': user.email,
+        'name': user.userMetadata?['name'],
+      };
+    });
+  }
+}

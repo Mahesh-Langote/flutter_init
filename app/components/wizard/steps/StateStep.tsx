@@ -21,7 +21,17 @@ export function StateStep() {
                 <RadioGroup
                     value={config.stateManagement}
                     onValueChange={(value) => {
-                        updateConfig({ stateManagement: value as StateManagement })
+                        const stateManagement = value as StateManagement
+                        const updates: any = { stateManagement }
+
+                        if (stateManagement === "riverpod") {
+                            updates.misc = {
+                                ...config.misc,
+                                usesFlutterHooks: true,
+                            }
+                        }
+
+                        updateConfig(updates)
                     }}
                     className="grid gap-3"
                 >

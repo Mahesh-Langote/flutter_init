@@ -32,7 +32,6 @@ type TemplateContext = ScaffoldConfig & {
         usesFlutterSvg: boolean
         usesSkeletonizer: boolean
         usesScreenutil: boolean
-        usesAnimate: boolean
         usesDotenv: boolean
         usesLogger: boolean
         usesIconsaxPlus: boolean
@@ -43,7 +42,16 @@ type TemplateContext = ScaffoldConfig & {
         fallbackLocale: string
         hasFlavors: boolean
         hasDarkMode: boolean
-
+        usesFlutterHooks: boolean
+        usesImagePicker: boolean
+        usesFilePicker: boolean
+        usesPathProvider: boolean
+        usesSharePlus: boolean
+        usesPermissionHandler: boolean
+        usesUrlLauncher: boolean
+        usesDeviceInfoPlus: boolean
+        usesPackageInfoPlus: boolean
+        usesAppVersionUpdate: boolean
     }
 }
 
@@ -119,18 +127,17 @@ function buildTemplateContext(config: ScaffoldConfig): TemplateContext {
             usesSupabase: config.backend.provider === "supabase",
             usesAppwrite: config.backend.provider === "appwrite",
             usesCustomRest: config.backend.provider === "customRest",
-            usesDio: config.backend.provider === "customRest",
-            usesHttp: false,
-            usesHive: false,
-            usesSharedPreferences: true,
-            usesSecureStorage: true,
-            usesCachedNetworkImage: true,
-            usesFlutterSvg: true,
-            usesSkeletonizer: true,
-            usesScreenutil: true,
-            usesAnimate: true,
-            usesDotenv: true,
-            usesLogger: true,
+            usesDio: config.misc.usesDio,
+            usesHttp: config.misc.usesHttp,
+            usesHive: config.misc.usesHive,
+            usesSharedPreferences: config.misc.usesSharedPreferences,
+            usesSecureStorage: config.misc.usesSecureStorage,
+            usesCachedNetworkImage: config.misc.usesCachedNetworkImage,
+            usesFlutterSvg: config.misc.usesFlutterSvg,
+            usesSkeletonizer: config.misc.usesSkeletonizer,
+            usesScreenutil: config.misc.usesScreenutil,
+            usesDotenv: config.misc.usesDotenv,
+            usesLogger: config.misc.usesLogger,
             supportsLocalization: config.localization.enabled,
             supportedLocales: config.localization.supportedLocales.length > 0 ? config.localization.supportedLocales : ["en"],
             fallbackLocale: config.localization.supportedLocales.length > 0 ? config.localization.supportedLocales[0] : "en",
@@ -139,6 +146,16 @@ function buildTemplateContext(config: ScaffoldConfig): TemplateContext {
             usesIconsaxPlus: config.icons.iconsax_plus,
             usesFlutterRemix: config.icons.flutter_remix,
             usesHugeicons: config.icons.hugeicons,
+            usesFlutterHooks: config.misc.usesFlutterHooks,
+            usesImagePicker: config.misc.usesImagePicker,
+            usesFilePicker: config.misc.usesFilePicker,
+            usesPathProvider: config.misc.usesPathProvider,
+            usesSharePlus: config.misc.usesSharePlus,
+            usesPermissionHandler: config.misc.usesPermissionHandler,
+            usesUrlLauncher: config.misc.usesUrlLauncher,
+            usesDeviceInfoPlus: config.misc.usesDeviceInfoPlus,
+            usesPackageInfoPlus: config.misc.usesPackageInfoPlus,
+            usesAppVersionUpdate: config.misc.usesAppVersionUpdate,
         },
     }
 }
@@ -160,12 +177,37 @@ async function resolveOverlayDirs(
             path.join(root, "overlays", "routing", "auto_route"),
             config.navigation === "auto_route",
         ],
-        [path.join(root, "overlays", "networking", "dio"), config.backend.provider === "customRest"],
-        [path.join(root, "overlays", "networking", "http"), false],
+        [path.join(root, "overlays", "networking", "dio"), config.misc.usesDio],
+        [
+            path.join(root, "overlays", "networking", "http"),
+            config.misc.usesHttp && !config.misc.usesDio,
+        ],
+        [
+            path.join(root, "overlays", "networking", "cached_image"),
+            config.misc.usesCachedNetworkImage,
+        ],
         [path.join(root, "overlays", "extras", "localization"), config.localization.enabled],
-        [path.join(root, "overlays", "storage", "secure_storage"), true],
+        [path.join(root, "overlays", "storage", "secure_storage"), config.misc.usesSecureStorage],
+        [path.join(root, "overlays", "storage", "hive"), config.misc.usesHive],
+        [path.join(root, "overlays", "storage", "shared_preferences"), config.misc.usesSharedPreferences],
+        [path.join(root, "overlays", "utilities", "path_provider"), config.misc.usesPathProvider],
+        [path.join(root, "overlays", "utilities", "share_plus"), config.misc.usesSharePlus],
+        [path.join(root, "overlays", "utilities", "permission_handler"), config.misc.usesPermissionHandler],
+        [path.join(root, "overlays", "utilities", "url_launcher"), config.misc.usesUrlLauncher],
+        [
+            path.join(root, "overlays", "media"),
+            config.misc.usesImagePicker || config.misc.usesFilePicker,
+        ],
+        [
+            path.join(root, "overlays", "device", "device_info"),
+            config.misc.usesDeviceInfoPlus,
+        ],
+        [
+            path.join(root, "overlays", "device", "app_version_update"),
+            config.misc.usesAppVersionUpdate,
+        ],
         [path.join(root, "overlays", "extras", "flavors"), true],
-        [path.join(root, "overlays", "extras", "dotenv"), true],
+        [path.join(root, "overlays", "extras", "dotenv"), config.misc.usesDotenv],
     ]
 
     for (const [candidate, enabled] of candidates) {

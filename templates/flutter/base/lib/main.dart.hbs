@@ -26,6 +26,10 @@ Future<void> main() async {
   {{/if}}
   {{#if (eq backend.provider "supabase")}}
   await Supabase.initialize(
+    {{#if flags.usesDotenv}}
+    url: dotenv.get('SUPABASE_URL', fallback: 'https://YOUR-PROJECT.supabase.co'),
+    anonKey: dotenv.get('SUPABASE_ANON_KEY', fallback: 'YOUR-ANON-KEY'),
+    {{else}}
     url: const String.fromEnvironment(
       'SUPABASE_URL',
       defaultValue: 'https://YOUR-PROJECT.supabase.co',
@@ -34,34 +38,32 @@ Future<void> main() async {
       'SUPABASE_ANON_KEY',
       defaultValue: 'YOUR-ANON-KEY',
     ),
+    {{/if}}
+  );
+  {{/if}}
+  {{#if (eq backend.provider "appwrite")}}
+  AuthService.instance.init(
+    {{#if flags.usesDotenv}}
+    endpoint: dotenv.get('APPWRITE_ENDPOINT', fallback: 'https://cloud.appwrite.io/v1'),
+    projectId: dotenv.get('APPWRITE_PROJECT_ID', fallback: 'your-project-id'),
+    {{else}}
+    endpoint: const String.fromEnvironment(
+      'APPWRITE_ENDPOINT',
+      defaultValue: 'https://cloud.appwrite.io/v1',
+    ),
+    projectId: const String.fromEnvironment(
+      'APPWRITE_PROJECT_ID',
+      defaultValue: 'your-project-id',
+    ),
+    {{/if}}
   );
   {{/if}}
 
-  {{#if flags.isRiverpod}}
   runApp(
-    {{#if flags.supportsLocalization}}
-    EasyLocalization(
-      supportedLocales: const [{{#each flags.supportedLocales}}Locale('{{this}}'),{{/each}}],
-      path: 'assets/translations',
-      fallbackLocale: const Locale('{{flags.fallbackLocale}}'),
-      child: const ProviderScope(child: App()),
-    )
-    {{else}}
-    const ProviderScope(child: App())
-    {{/if}}
+    LocalizationWrapper(
+      child: StateWrapper(
+        child: const App(),
+      ),
+    ),
   );
-  {{else}}
-  runApp(
-    {{#if flags.supportsLocalization}}
-    EasyLocalization(
-      supportedLocales: const [{{#each flags.supportedLocales}}Locale('{{this}}'),{{/each}}],
-      path: 'assets/translations',
-      fallbackLocale: const Locale('{{flags.fallbackLocale}}'),
-      child: const App(),
-    )
-    {{else}}
-    const App()
-    {{/if}}
-  );
-  {{/if}}
 }

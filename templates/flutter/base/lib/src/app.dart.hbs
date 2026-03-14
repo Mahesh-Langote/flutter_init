@@ -6,14 +6,17 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(360, 690),
-      minTextAdapt: true,
-      splitScreenMode: true,
-      builder: (context, child) {
-        return _buildMaterialApp(context);
-      },
-    );
+    Widget current = _buildMaterialApp(context);
+
+    {{#if flags.usesSkeletonizer}}
+    current = SkeletonWrapper(child: current);
+    {{/if}}
+
+    {{#if flags.usesScreenutil}}
+    current = ScreenUtilWrapper(child: current);
+    {{/if}}
+
+    return current;
   }
 
   Widget _buildMaterialApp(BuildContext context) {
@@ -37,6 +40,9 @@ class App extends StatelessWidget {
       supportedLocales: context.supportedLocales,
       locale: context.locale,
       {{/if}}
+      builder: (context, child) {
+        return child!;
+      },
     );
   }
 }

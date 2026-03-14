@@ -2,8 +2,26 @@
 export function SummaryItem({ label, value }: { label: string; value: string }) {
     return (
         <div className="flex items-center justify-between rounded-lg border border-border/40 bg-card/40 p-3 backdrop-blur-sm hover:bg-card/60 hover:border-border/60 transition-colors">
+            <span className="text-sm text-muted-foreground shrink-0">{label}</span>
+            <span className="text-sm font-medium text-foreground tracking-tight text-right">{value}</span>
+        </div>
+    )
+}
+
+export function SummaryTagItem({ label, tags }: { label: string; tags: string[] }) {
+    return (
+        <div className="flex flex-col gap-2 rounded-lg border border-border/40 bg-card/40 p-3 backdrop-blur-sm hover:bg-card/60 hover:border-border/60 transition-colors">
             <span className="text-sm text-muted-foreground">{label}</span>
-            <span className="text-sm font-medium text-foreground tracking-tight">{value}</span>
+            <div className="flex flex-wrap gap-1.5">
+                {tags.map((tag) => (
+                    <span
+                        key={tag}
+                        className="inline-flex items-center rounded-md border border-border/50 bg-muted/60 px-2 py-0.5 text-xs font-medium text-foreground/80 backdrop-blur-sm"
+                    >
+                        {tag}
+                    </span>
+                ))}
+            </div>
         </div>
     )
 }

@@ -5,6 +5,7 @@ import { BasicsStep } from "./steps/BasicsStep"
 import { GenerateStep } from "./steps/GenerateStep"
 import { IconsStep } from "./steps/IconsStep"
 import { LocalizationStep } from "./steps/LocalizationStep"
+import { MiscStep } from "./steps/MiscStep"
 import { NavigationStep } from "./steps/NavigationStep"
 import { StateStep } from "./steps/StateStep"
 import { ThemeStep } from "./steps/ThemeStep"
@@ -27,6 +28,8 @@ export function StepContent({ step }: { step: StepId }) {
             return <BackendStep />
         case "localization":
             return <LocalizationStep />
+        case "misc":
+            return <MiscStep />
         case "generate":
         default:
             return <GenerateStep />

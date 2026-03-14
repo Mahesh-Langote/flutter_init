@@ -2,12 +2,15 @@
 import 'package:easy_localization/easy_localization.dart';
 {{/if}}
 import '../../../imports/imports.dart';
-import '../../../shared/widgets/app_top_bar.dart';
 
 {{#if (eq flags.routerPackage "auto_route")}}
 @RoutePage()
 {{/if}}
+{{#if flags.usesFlutterHooks}}
 class HomePage extends HookWidget {
+{{else}}
+class HomePage extends StatelessWidget {
+{{/if}}
   const HomePage({super.key});
 
   @override
@@ -23,7 +26,7 @@ class HomePage extends HookWidget {
       ),
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.all(AppSpacing.xl.w),
+          padding: EdgeInsets.all({{res 'AppSpacing.xl' 'w' flags.usesScreenutil}}),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -38,26 +41,26 @@ class HomePage extends HookWidget {
                 {{else}}
                 Icons.home_rounded,
                 {{/if}}
-                size: 60.sp,
+                size: {{res 60 'sp' flags.usesScreenutil}},
                 color: colorScheme.primary,
               ),
-              SizedBox(height: AppSpacing.lg.h),
+              SizedBox(height: {{res 'AppSpacing.lg' 'h' flags.usesScreenutil}}),
               Text(
                 {{#if flags.supportsLocalization}}'home.welcome_home'.tr(){{else}}'Welcome Home!'{{/if}},
                 textAlign: TextAlign.center,
                 style: textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.w900,
                   color: colorScheme.onSurface,
-                  fontSize: 28.sp,
+                  fontSize: {{res 28 'sp' flags.usesScreenutil}},
                 ),
               ),
-              SizedBox(height: AppSpacing.md.h),
+              SizedBox(height: {{res 'AppSpacing.md' 'h' flags.usesScreenutil}}),
               Text(
                 {{#if flags.supportsLocalization}}'home.home_subtitle'.tr(){{else}}'You have successfully completed the onboarding process.'{{/if}},
                 textAlign: TextAlign.center,
                 style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
-                  fontSize: 14.sp,
+                  fontSize: {{res 14 'sp' flags.usesScreenutil}},
                 ),
               ),
             ],

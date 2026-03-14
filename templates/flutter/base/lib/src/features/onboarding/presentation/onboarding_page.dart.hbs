@@ -2,12 +2,12 @@
 import 'package:auto_route/auto_route.dart';
 {{/if}}
 import '../../../imports/imports.dart';
-import '../../../shared/widgets/app_button.dart';
 import '../../../routing/app_routes.dart';
 
 {{#if (eq flags.routerPackage "auto_route")}}
 @RoutePage()
 {{/if}}
+{{#if flags.usesFlutterHooks}}
 class OnboardingPage extends HookWidget {
   const OnboardingPage({super.key});
 
@@ -52,6 +52,118 @@ class OnboardingPage extends HookWidget {
       {{/if}}
     }
 
+    return _OnboardingView(
+      theme: theme,
+      colorScheme: colorScheme,
+      textTheme: textTheme,
+      pageController: pageController,
+      currentIndex: currentIndex.value,
+      onboardingData: onboardingData,
+      onPageChanged: (index) => currentIndex.value = index,
+      onGetStarted: onGetStarted,
+    );
+  }
+}
+{{else}}
+class OnboardingPage extends StatefulWidget {
+  const OnboardingPage({super.key});
+
+  @override
+  State<OnboardingPage> createState() => _OnboardingPageState();
+}
+
+class _OnboardingPageState extends State<OnboardingPage> {
+  late final PageController _pageController;
+  int _currentIndex = 0;
+
+  late final List<Map<String, dynamic>> _onboardingData;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+    _onboardingData = [
+      {
+        'title': {{#if flags.supportsLocalization}}'onboarding.onboarding_title_1'.tr(){{else}}'Your Journey,\nPerfectly Planned'{{/if}},
+        'subtitle':
+            {{#if flags.supportsLocalization}}'onboarding.onboarding_subtitle_1'.tr(){{else}}'Effortlessly create and organize your\ndream trips. Start exploring now!'{{/if}},
+        'pageWidget': const FlutterLogo(size: 200),
+      },
+      {
+        'title': {{#if flags.supportsLocalization}}'onboarding.onboarding_title_2'.tr(){{else}}'Discover\nFriends Nearby'{{/if}},
+        'subtitle':
+            {{#if flags.supportsLocalization}}'onboarding.onboarding_subtitle_2'.tr(){{else}}'See where your friends are traveling and\nexplore the world together.'{{/if}},
+        'pageWidget': const FlutterLogo(size: 200),
+      },
+      {
+        'title': {{#if flags.supportsLocalization}}'onboarding.onboarding_title_3'.tr(){{else}}'Stay Updated\nwith Top Places'{{/if}},
+        'subtitle':
+            {{#if flags.supportsLocalization}}'onboarding.onboarding_subtitle_3'.tr(){{else}}'Find trending destinations and must-see attractions,\nall tailored to enhance your travel plans.'{{/if}},
+        'pageWidget': const FlutterLogo(size: 200),
+      },
+    ];
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _onGetStarted() {
+    // Navigate back or to home. For template purpose:
+    {{#if (eq flags.routerPackage "go_router")}}
+    context.go(AppRoutes.login);
+    {{else if (eq flags.routerPackage "auto_route")}}
+    context.replaceRoute(const LoginRoute());
+    {{else}}
+    Navigator.pushReplacementNamed(context, AppRoutes.login);
+    {{/if}}
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return _OnboardingView(
+      theme: theme,
+      colorScheme: colorScheme,
+      textTheme: textTheme,
+      pageController: _pageController,
+      currentIndex: _currentIndex,
+      onboardingData: _onboardingData,
+      onPageChanged: (index) => setState(() => _currentIndex = index),
+      onGetStarted: _onGetStarted,
+    );
+  }
+}
+{{/if}}
+
+class _OnboardingView extends StatelessWidget {
+  const _OnboardingView({
+    required this.theme,
+    required this.colorScheme,
+    required this.textTheme,
+    required this.pageController,
+    required this.currentIndex,
+    required this.onboardingData,
+    required this.onPageChanged,
+    required this.onGetStarted,
+  });
+
+  final ThemeData theme;
+  final ColorScheme colorScheme;
+  final TextTheme textTheme;
+  final PageController pageController;
+  final int currentIndex;
+  final List<Map<String, dynamic>> onboardingData;
+  final ValueChanged<int> onPageChanged;
+  final VoidCallback onGetStarted;
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: colorScheme.surface,
       body: SafeArea(
@@ -60,15 +172,15 @@ class OnboardingPage extends HookWidget {
             // Top branding
             Padding(
               padding: EdgeInsets.only(
-                top: AppSpacing.lg.h,
-                bottom: AppSpacing.md.h,
+                top: {{res 'AppSpacing.lg' 'h' flags.usesScreenutil}},
+                bottom: {{res 'AppSpacing.md' 'h' flags.usesScreenutil}},
               ),
               child: Text(
                 'WanderWise.',
                 style: textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w900,
                   color: colorScheme.onSurface,
-                  fontSize: 22.sp,
+                  fontSize: {{res 22 'sp' flags.usesScreenutil}},
                 ),
               ),
             ),
@@ -78,9 +190,7 @@ class OnboardingPage extends HookWidget {
               child: PageView.builder(
                 controller: pageController,
                 itemCount: onboardingData.length,
-                onPageChanged: (index) {
-                  currentIndex.value = index;
-                },
+                onPageChanged: onPageChanged,
                 itemBuilder: (context, index) {
                   return Column(
                     children: [
@@ -89,7 +199,7 @@ class OnboardingPage extends HookWidget {
                         child: Center(
                           child: Padding(
                             padding: EdgeInsets.symmetric(
-                              horizontal: AppSpacing.lg.w,
+                              horizontal: {{res 'AppSpacing.lg' 'w' flags.usesScreenutil}},
                             ),
                             child: onboardingData[index]['pageWidget'] as Widget,
                           ),
@@ -99,7 +209,7 @@ class OnboardingPage extends HookWidget {
                       // Text Section
                       Padding(
                         padding: EdgeInsets.symmetric(
-                          horizontal: AppSpacing.xl.w,
+                          horizontal: {{res 'AppSpacing.xl' 'w' flags.usesScreenutil}},
                         ),
                         child: Column(
                           children: [
@@ -110,23 +220,23 @@ class OnboardingPage extends HookWidget {
                                 fontWeight: FontWeight.w700,
                                 color: colorScheme.onSurface,
                                 height: 1.2,
-                                fontSize: 24.sp,
+                                fontSize: {{res 24 'sp' flags.usesScreenutil}},
                               ),
                             ),
-                            SizedBox(height: AppSpacing.md.h),
+                            SizedBox(height: {{res 'AppSpacing.md' 'h' flags.usesScreenutil}}),
                             Text(
                               onboardingData[index]['subtitle'] as String,
                               textAlign: TextAlign.center,
                               style: textTheme.bodyMedium?.copyWith(
                                 color: colorScheme.onSurfaceVariant,
                                 height: 1.5,
-                                fontSize: 14.sp,
+                                fontSize: {{res 14 'sp' flags.usesScreenutil}},
                               ),
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(height: 40.h),
+                      SizedBox(height: {{res 40 'h' flags.usesScreenutil}}),
                     ],
                   );
                 },
@@ -135,7 +245,7 @@ class OnboardingPage extends HookWidget {
 
             // Bottom Section: Dots and Button
             Padding(
-              padding: EdgeInsets.all(AppSpacing.xl.w),
+              padding: EdgeInsets.all({{res 'AppSpacing.xl' 'w' flags.usesScreenutil}}),
               child: Column(
                 children: [
                   // Dot Indicators
@@ -145,12 +255,12 @@ class OnboardingPage extends HookWidget {
                     effect: ExpandingDotsEffect(
                       activeDotColor: colorScheme.primary,
                       dotColor: colorScheme.primary.withOpacity(0.2),
-                      dotHeight: 8.h,
-                      dotWidth: 8.w,
-                      spacing: 8.w,
+                      dotHeight: {{res 8 'h' flags.usesScreenutil}},
+                      dotWidth: {{res 8 'w' flags.usesScreenutil}},
+                      spacing: {{res 8 'w' flags.usesScreenutil}},
                     ),
                   ),
-                  SizedBox(height: AppSpacing.xl.h),
+                  SizedBox(height: {{res 'AppSpacing.xl' 'h' flags.usesScreenutil}}),
                   // Get Started Button
                   AppButton(
                     label: {{#if flags.supportsLocalization}}'shared.get_started'.tr(){{else}}'Get Started'{{/if}},
@@ -159,7 +269,7 @@ class OnboardingPage extends HookWidget {
                     height: ButtonSize.medium,
                     width: ButtonSize.medium,
                   ),
-                  SizedBox(height: AppSpacing.md.h),
+                  SizedBox(height: {{res 'AppSpacing.md' 'h' flags.usesScreenutil}}),
                 ],
               ),
             ),

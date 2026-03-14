@@ -4,7 +4,7 @@ import { useWizard } from "@/app/lib/state/useWizardStore"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import * as React from "react"
-import { SummaryItem } from "../SummaryItem"
+import { SummaryItem, SummaryTagItem } from "../SummaryItem"
 
 export function GenerateStep() {
     const { config, prev } = useWizard()
@@ -56,16 +56,38 @@ export function GenerateStep() {
                     <SummaryItem label="State" value={config.stateManagement} />
                     <SummaryItem label="Navigation" value={config.navigation} />
                     <SummaryItem label="Backend" value={config.backend.provider} />
-                    <SummaryItem
+                    <SummaryTagItem
                         label="Icons"
-                        value={[
+                        tags={[
                             "Default",
                             config.icons.iconsax_plus && "Iconsax Plus",
                             config.icons.flutter_remix && "Flutter Remix",
                             config.icons.hugeicons && "Hugeicons",
-                        ]
-                            .filter(Boolean)
-                            .join(", ")}
+                        ].filter(Boolean) as string[]}
+                    />
+                    <SummaryTagItem
+                        label="Misc"
+                        tags={[
+                            config.misc.usesScreenutil && "Screenutil",
+                            config.misc.usesDio && "Dio",
+                            config.misc.usesHttp && "HTTP",
+                            config.misc.usesHive && "Hive",
+                            config.misc.usesSharedPreferences && "Shared Pref",
+                            config.misc.usesSecureStorage && "Secure Storage",
+                            config.misc.usesCachedNetworkImage && "Cached Image",
+                            config.misc.usesFlutterSvg && "SVG",
+                            config.misc.usesSkeletonizer && "Skeletonizer",
+                            config.misc.usesFlutterHooks && "Hooks",
+                            config.misc.usesImagePicker && "Image Picker",
+                            config.misc.usesFilePicker && "File Picker",
+                            config.misc.usesUrlLauncher && "Url Launcher",
+                            config.misc.usesPermissionHandler && "Permissions",
+                            config.misc.usesDeviceInfoPlus && "Device Info",
+                            config.misc.usesPackageInfoPlus && "Package Info",
+                            config.misc.usesAppVersionUpdate && "App Version",
+                            config.misc.usesDotenv && "Dotenv",
+
+                        ].filter(Boolean) as string[]}
                     />
                 </div>
 

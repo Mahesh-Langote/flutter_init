@@ -15,9 +15,18 @@ export function BackendStep() {
     const { config, updateConfig, next, prev, setSelectedItem } = useWizard()
 
     const handleProviderChange = (provider: BackendProvider) => {
-        updateConfig({
+        const updates: any = {
             backend: defaultBackendConfig(provider),
-        })
+        }
+
+        if (provider === "customRest") {
+            updates.misc = {
+                ...config.misc,
+                usesDio: true,
+            }
+        }
+
+        updateConfig(updates)
     }
 
     const backend = config.backend

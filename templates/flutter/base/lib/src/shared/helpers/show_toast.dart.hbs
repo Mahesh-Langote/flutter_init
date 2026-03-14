@@ -1,5 +1,5 @@
-import '../imports/imports.dart';
-import '../routing/global_navigator.dart';
+import '../../imports/imports.dart';
+import '../../routing/global_navigator.dart';
 
 void showToast(
   BuildContext context, {
@@ -58,13 +58,13 @@ void showToast(
                     ? {{#if flags.usesIconsaxPlus}}IconsaxPlusBold.danger{{else if flags.usesFlutterRemix}}FlutterRemix.error_warning_fill{{else if flags.usesHugeicons}}HugeIcons.strokeRoundedAlertCircle{{else}}Icons.error_outline{{/if}}
                     : {{#if flags.usesIconsaxPlus}}IconsaxPlusBold.info_circle{{else if flags.usesFlutterRemix}}FlutterRemix.information_fill{{else if flags.usesHugeicons}}HugeIcons.strokeRoundedInformationCircle{{else}}Icons.info_outline{{/if}}),
         color: iconColor,
-        size: 22.sp,
+        size: {{res 22 'sp' flags.usesScreenutil}},
       ),
       title: Text(
         message,
         style: context.theme.textTheme.labelSmall!.copyWith(
           fontWeight: FontWeight.w600,
-          fontSize: 11.sp,
+          fontSize: {{res 11 'sp' flags.usesScreenutil}},
           color: foregroundColor,
         ),
       ),

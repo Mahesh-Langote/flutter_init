@@ -1,45 +1,39 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../utils/utils.dart';
 
-/// Service for securely storing sensitive data using platform-native encryption.
+/// A service to securely store sensitive data like JWT tokens or API keys.
 /// 
-/// Uses [FlutterSecureStorage] which uses Keychain on iOS and Keystore on Android.
+/// Uses [FlutterSecureStorage] which utilizes Keychain (iOS) and Keystore (Android).
 class SecureStorageService {
-  final FlutterSecureStorage _storage;
+  SecureStorageService._();
+  static final SecureStorageService instance = SecureStorageService._();
 
-  SecureStorageService({FlutterSecureStorage? storage})
-      : _storage = storage ?? const FlutterSecureStorage(
-          aOptions: AndroidOptions(
-            encryptedSharedPreferences: true,
-          ),
-        );
+  final _storage = const FlutterSecureStorage(
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+  );
 
-  /// Stores a [value] associated with [key].
-  Future<void> write(String key, String value) async {
-    await _storage.write(key: key, value: value);
+  /// Write a sensitive value to secure storage.
+  FutureEither<void> write(String key, String value) async {
+    return runTask(() => _storage.write(key: key, value: value));
   }
 
-  /// Retrieves the value associated with [key], or null if not found.
-  Future<String?> read(String key) async {
-    return await _storage.read(key: key);
+  /// Read a sensitive value from secure storage.
+  FutureEither<String?> read(String key) async {
+    return runTask(() => _storage.read(key: key));
   }
 
-  /// Removes the value associated with [key].
-  Future<void> delete(String key) async {
-    await _storage.delete(key: key);
+  /// Delete a specific key from secure storage.
+  FutureEither<void> delete(String key) async {
+    return runTask(() => _storage.delete(key: key));
   }
 
-  /// Removes all values from secure storage.
-  Future<void> deleteAll() async {
-    await _storage.deleteAll();
+  /// Wipe all data from secure storage.
+  FutureEither<void> deleteAll() async {
+    return runTask(() => _storage.deleteAll());
   }
 
-  /// Returns true if the storage contains the given [key].
-  Future<bool> containsKey(String key) async {
-    return await _storage.containsKey(key: key);
-  }
-
-  /// Reads all values from secure storage.
-  Future<Map<String, String>> readAll() async {
-    return await _storage.readAll();
+  /// Check if a key exists in secure storage.
+  FutureEither<bool> containsKey(String key) async {
+    return runTask(() => _storage.containsKey(key: key));
   }
 }

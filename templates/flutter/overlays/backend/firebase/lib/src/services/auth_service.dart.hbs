@@ -1,25 +1,75 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import '../utils/utils.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb;
 
 class AuthService {
-AuthService() : _auth = FirebaseAuth.instance;
+  AuthService._();
+  static final AuthService instance = AuthService._();
 
-final FirebaseAuth _auth;
+  final fb.FirebaseAuth _firebaseAuth = fb.FirebaseAuth.instance;
 
-Future<UserCredential> signInAnonymously() {
-    return _auth.signInAnonymously();
-    }
+  FutureEither<Map<String, dynamic>?> login({
+    required String email,
+    required String password,
+  }) async {
+    return runTask(() async {
+      final cred = await _firebaseAuth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      final user = cred.user;
+      if (user == null) return null;
+      return {
+        'id': user.uid,
+        'email': user.email,
+        'name': user.displayName,
+        'photoUrl': user.photoURL,
+      };
+    }, requiresNetwork: true);
+  }
 
-    {{#if backend.options.authEmail}}
-    Future<UserCredential> signInWithEmail(String email, String password) {
-        return _auth.signInWithEmailAndPassword(email: email, password: password);
-        }
-        {{/if}}
+  FutureEither<Map<String, dynamic>?> signUp({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    return runTask(() async {
+      final cred = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      final user = cred.user;
+      if (user == null) return null;
+      await user.updateDisplayName(name);
+      return {
+        'id': user.uid,
+        'email': user.email,
+        'name': name,
+      };
+    }, requiresNetwork: true);
+  }
 
-        {{#if backend.options.authGoogle}}
-        // Provide Google Sign-In implementation in the app layer (not included here).
-        {{/if}}
+  FutureEither<void> forgotPassword({required String email}) async {
+    return runTask(() async {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+    }, requiresNetwork: true);
+  }
 
-        {{#if backend.options.authPhone}}
-        // Provide phone auth verification in the UI layer.
-        {{/if}}
-        }
+  FutureEither<void> logout() async {
+    return runTask(() async {
+      await _firebaseAuth.signOut();
+    }, requiresNetwork: true);
+  }
+
+  FutureEither<Map<String, dynamic>?> getCurrentUser() async {
+    return runTask(() async {
+      final user = _firebaseAuth.currentUser;
+      if (user == null) return null;
+      return {
+        'id': user.uid,
+        'email': user.email,
+        'name': user.displayName,
+        'photoUrl': user.photoURL,
+      };
+    });
+  }
+}

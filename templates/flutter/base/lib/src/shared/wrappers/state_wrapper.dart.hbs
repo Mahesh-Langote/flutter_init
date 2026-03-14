@@ -1,0 +1,30 @@
+import '../../imports/imports.dart';
+
+/// A wrapper to initialize the chosen State Management library.
+class StateWrapper extends StatelessWidget {
+  final Widget child;
+
+  const StateWrapper({
+    super.key,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    {{#if flags.isRiverpod}}
+    return ProviderScope(child: child);
+    {{else if flags.isProvider}}
+    return MultiProvider(
+      providers: const [], // Add global providers here
+      child: child,
+    );
+    {{else if flags.isBloc}}
+    return MultiBlocProvider(
+      providers: const [], // Add global blocs here
+      child: child,
+    );
+    {{else}}
+    return child;
+    {{/if}}
+  }
+}

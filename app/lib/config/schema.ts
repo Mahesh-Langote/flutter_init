@@ -56,6 +56,7 @@ export type StepId =
     | "navigation"
     | "backend"
     | "localization"
+    | "misc"
     | "generate"
 
 export const stepOrder: StepId[] = [
@@ -67,6 +68,7 @@ export const stepOrder: StepId[] = [
     "navigation",
     "backend",
     "localization",
+    "misc",
     "generate",
 ]
 
@@ -119,6 +121,35 @@ const backendSchema = z.discriminatedUnion("provider", [
 ])
 export type BackendConfig = z.infer<typeof backendSchema>
 
+const miscSchema = z.object({
+    usesScreenutil: z.boolean(),
+    usesDio: z.boolean(),
+    usesHttp: z.boolean(),
+    usesHive: z.boolean(),
+    usesSharedPreferences: z.boolean(),
+    usesSecureStorage: z.boolean(),
+    usesCachedNetworkImage: z.boolean(),
+    usesFlutterSvg: z.boolean(),
+    usesSkeletonizer: z.boolean(),
+    usesDotenv: z.boolean(),
+    usesLogger: z.boolean(),
+    // Hooks
+    usesFlutterHooks: z.boolean(),
+    // Media
+    usesImagePicker: z.boolean(),
+    usesFilePicker: z.boolean(),
+    // Utilities
+    usesUrlLauncher: z.boolean(),
+    usesPathProvider: z.boolean(),
+    usesSharePlus: z.boolean(),
+    usesPermissionHandler: z.boolean(),
+    // Device
+    usesDeviceInfoPlus: z.boolean(),
+    usesPackageInfoPlus: z.boolean(),
+    usesAppVersionUpdate: z.boolean(),
+})
+export type MiscConfig = z.infer<typeof miscSchema>
+
 const localizationSchema = z.object({
     enabled: z.boolean(),
     supportedLocales: z.array(z.string()).min(1),
@@ -141,6 +172,30 @@ export const scaffoldConfigSchema = z.object({
         flutter_remix: false,
         hugeicons: false,
     }),
+    misc: miscSchema.default({
+        usesScreenutil: true,
+        usesDio: false,
+        usesHttp: false,
+        usesHive: false,
+        usesSharedPreferences: true,
+        usesSecureStorage: true,
+        usesCachedNetworkImage: true,
+        usesFlutterSvg: true,
+        usesSkeletonizer: true,
+        usesDotenv: true,
+        usesLogger: true,
+        usesFlutterHooks: false,
+        usesImagePicker: false,
+        usesFilePicker: false,
+        usesUrlLauncher: true,
+        usesPathProvider: true,
+        usesSharePlus: false,
+        usesPermissionHandler: true,
+        usesDeviceInfoPlus: true,
+        usesPackageInfoPlus: false,
+        usesAppVersionUpdate: true,
+
+    }),
 })
 
 export type ScaffoldConfig = z.infer<typeof scaffoldConfigSchema>
@@ -148,7 +203,7 @@ export type ScaffoldConfig = z.infer<typeof scaffoldConfigSchema>
 export function derivePackageId(appName: string) {
     const cleaned = appName
         .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "_")
+        .replace(/\s+/g, "_")
         .replace(/^_+|_+$/g, "")
 
     if (!cleaned) {
@@ -178,6 +233,30 @@ export const defaultConfig: ScaffoldConfig = {
     localization: { enabled: true, supportedLocales: ["en", "es"] },
     navigation: "go_router",
     architecture: "feature-first",
+    misc: {
+        usesScreenutil: true,
+        usesDio: false,
+        usesHttp: false,
+        usesHive: false,
+        usesSharedPreferences: true,
+        usesSecureStorage: true,
+        usesCachedNetworkImage: true,
+        usesFlutterSvg: true,
+        usesSkeletonizer: true,
+        usesDotenv: true,
+        usesLogger: true,
+        usesFlutterHooks: false,
+        usesImagePicker: false,
+        usesFilePicker: false,
+        usesUrlLauncher: true,
+        usesPathProvider: true,
+        usesSharePlus: false,
+        usesPermissionHandler: true,
+        usesDeviceInfoPlus: true,
+        usesPackageInfoPlus: false,
+        usesAppVersionUpdate: true,
+
+    },
 }
 
 export function defaultBackendConfig(

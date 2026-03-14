@@ -29,21 +29,22 @@ class CommonImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double? adjustedWidth = width?.w;
-    final double? adjustedHeight = height?.h;
+    final double? adjustedWidth = {{#if flags.usesScreenutil}}width?.w{{else}}width{{/if}};
+    final double? adjustedHeight = {{#if flags.usesScreenutil}}height?.h{{else}}height{{/if}};
 
     Widget image;
 
     if (imageUrl.startsWith('http')) {
       {{#if flags.usesCachedNetworkImage}}
-      image = CachedNetworkImage(
+      image = AppCachedImage(
         imageUrl: imageUrl,
-        width: adjustedWidth,
-        height: adjustedHeight,
+        width: width,
+        height: height,
         fit: fit,
         color: color,
-        placeholder: (context, url) => placeholder ?? _buildDefaultPlaceholder(),
-        errorWidget: (context, url, error) => errorWidget ?? _buildDefaultErrorWidget(),
+        placeholder: placeholder,
+        errorWidget: errorWidget,
+        borderRadius: borderRadius,
       );
       {{else}}
       image = Image.network(
@@ -86,17 +87,6 @@ class CommonImage extends StatelessWidget {
     }
 
     return image;
-  }
-
-  Widget _buildDefaultPlaceholder() {
-    return Container(
-      width: width,
-      height: height,
-      color: Colors.grey[200],
-      child: const Center(
-        child: CircularProgressIndicator(strokeWidth: 2),
-      ),
-    );
   }
 
   Widget _buildDefaultErrorWidget() {

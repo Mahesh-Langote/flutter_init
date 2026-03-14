@@ -79,6 +79,12 @@ export function registerHelpers(hbs: Hbs) {
     hbs.registerHelper("indent", (text: string, spaces = 2) =>
         indentLines(text, Number(spaces))
     )
+    hbs.registerHelper("res", (value: number, unit: string, usesScreenutil: boolean) => {
+        if (usesScreenutil) {
+            return `${value}.${unit}`
+        }
+        return `${value}.0`
+    })
     hbs.registerHelper("when", function (this: unknown, condition, options) {
         return condition ? options.fn(this) : options.inverse(this)
     })

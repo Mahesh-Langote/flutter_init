@@ -1,16 +1,95 @@
+import '../utils/utils.dart';
 import 'package:appwrite/appwrite.dart';
 
 class AuthService {
-AuthService(this.client);
+  AuthService._();
+  static final AuthService instance = AuthService._();
 
-final Client client;
+  late final Client _client;
+  late final Account _account;
 
-Account get _account => Account(client);
+  /// Call this once during app startup (e.g. in main.dart) to initialize the Appwrite client.
+  void init({
+    required String endpoint,
+    required String projectId,
+  }) {
+    _client = Client()
+      ..setEndpoint(endpoint)
+      ..setProject(projectId)
+      ..setSelfSigned(status: true);
+    _account = Account(_client);
+  }
 
-Future<Session> signInWithEmail(String email, String password) {
-    return _account.createEmailPasswordSession(
-    email: email,
-    password: password,
-    );
-    }
-    }
+  FutureEither<Map<String, dynamic>?> login({
+    required String email,
+    required String password,
+  }) async {
+    return runTask(() async {
+      await _account.createEmailPasswordSession(
+        email: email,
+        password: password,
+      );
+      final user = await _account.get();
+      return {
+        'id': user.$id,
+        'email': user.email,
+        'name': user.name,
+      };
+    }, requiresNetwork: true);
+  }
+
+  FutureEither<Map<String, dynamic>?> signUp({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    return runTask(() async {
+      final user = await _account.create(
+        userId: ID.unique(),
+        email: email,
+        password: password,
+        name: name,
+      );
+      // Auto-login after sign up
+      await _account.createEmailPasswordSession(
+        email: email,
+        password: password,
+      );
+      return {
+        'id': user.$id,
+        'email': user.email,
+        'name': user.name,
+      };
+    }, requiresNetwork: true);
+  }
+
+  FutureEither<void> forgotPassword({required String email}) async {
+    return runTask(() async {
+      await _account.createRecovery(
+        email: email,
+        url: 'https://example.com/reset-password',
+      );
+    }, requiresNetwork: true);
+  }
+
+  FutureEither<void> logout() async {
+    return runTask(() async {
+      await _account.deleteSession(sessionId: 'current');
+    }, requiresNetwork: true);
+  }
+
+  FutureEither<Map<String, dynamic>?> getCurrentUser() async {
+    return runTask(() async {
+      try {
+        final user = await _account.get();
+        return {
+          'id': user.$id,
+          'email': user.email,
+          'name': user.name,
+        };
+      } on AppwriteException {
+        return null;
+      }
+    });
+  }
+}
