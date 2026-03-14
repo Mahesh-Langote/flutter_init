@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "markdown-to-html": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "fc87b1a02397a9dbcfdff39cdcf627659d433608bafbd347c60049dd2766a227"
+    }
+  }
+}
