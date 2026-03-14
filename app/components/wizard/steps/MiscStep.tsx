@@ -41,11 +41,19 @@ export function MiscStep() {
     const { misc } = config
 
     const handleToggle = (key: keyof MiscConfig, value: boolean) => {
+        const newMisc = { ...misc, [key]: value }
+
+        if (config.backend.provider === "customRest" && !value) {
+            if (key === "usesDio" && !newMisc.usesHttp) {
+                newMisc.usesHttp = true
+            }
+            if (key === "usesHttp" && !newMisc.usesDio) {
+                newMisc.usesDio = true
+            }
+        }
+
         updateConfig({
-            misc: {
-                ...misc,
-                [key]: value,
-            },
+            misc: newMisc,
         })
     }
 

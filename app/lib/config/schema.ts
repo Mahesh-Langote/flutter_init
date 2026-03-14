@@ -196,6 +196,14 @@ export const scaffoldConfigSchema = z.object({
         usesAppVersionUpdate: true,
 
     }),
+}).refine((data) => {
+    if (data.backend.provider === "customRest") {
+        return data.misc.usesDio || data.misc.usesHttp
+    }
+    return true
+}, {
+    message: "Either Dio or HTTP client must be enabled when using Custom REST backend",
+    path: ["misc"],
 })
 
 export type ScaffoldConfig = z.infer<typeof scaffoldConfigSchema>

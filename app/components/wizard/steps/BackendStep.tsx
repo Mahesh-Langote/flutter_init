@@ -20,9 +20,11 @@ export function BackendStep() {
         }
 
         if (provider === "customRest") {
-            updates.misc = {
-                ...config.misc,
-                usesDio: true,
+            if (!config.misc.usesDio && !config.misc.usesHttp) {
+                updates.misc = {
+                    ...config.misc,
+                    usesDio: true,
+                }
             }
         }
 

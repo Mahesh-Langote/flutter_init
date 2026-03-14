@@ -1,70 +1,14 @@
 import '../utils/utils.dart';
-{{#if (eq backend.provider "firebase")}}
-import 'package:firebase_auth/firebase_auth.dart' as fb;
-{{else if (eq backend.provider "supabase")}}
-import 'package:supabase_flutter/supabase_flutter.dart' as sp;
-{{else}}
-{{#if flags.usesDio}}
-import './dio_service.dart';
-import 'package:dio/dio.dart';
-{{else if flags.usesHttp}}
-import './http_service.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-{{/if}}
-{{/if}}
 
 class AuthService {
   AuthService._();
   static final AuthService instance = AuthService._();
-
-  {{#if (eq backend.provider "firebase")}}
-  final fb.FirebaseAuth _firebaseAuth = fb.FirebaseAuth.instance;
-  {{else if (eq backend.provider "supabase")}}
-  final sp.SupabaseClient _supabaseClient = sp.Supabase.instance.client;
-  {{/if}}
 
   FutureEither<Map<String, dynamic>?> login({
     required String email,
     required String password,
   }) async {
     return runTask(() async {
-      {{#if (eq backend.provider "firebase")}}
-      final cred = await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
-      final user = cred.user;
-      if (user == null) return null;
-      return {
-        'id': user.uid,
-        'email': user.email,
-        'name': user.displayName,
-        'photoUrl': user.photoURL,
-      };
-      
-      {{else if (eq backend.provider "supabase")}}
-      final response = await _supabaseClient.auth.signInWithPassword(email: email, password: password);
-      final user = response.user;
-      if (user == null) return null;
-      return {
-        'id': user.id,
-        'email': user.email,
-        'name': user.userMetadata?['name'],
-      };
-      
-      {{else if flags.usesDio}}
-      final result = await DioService.instance.post('/auth/login', data: {'email': email, 'password': password});
-      return result.fold(
-        (failure) => throw failure,
-        (response) => response.data,
-      );
-      
-      {{else if flags.usesHttp}}
-      final result = await HttpService.instance.post('/auth/login', body: {'email': email, 'password': password});
-      return result.fold(
-        (failure) => throw failure,
-        (response) => jsonDecode(response.body),
-      );
-      
-      {{else}}
       await Future.delayed(const Duration(seconds: 2));
       if (password.length < 6) throw Exception('Invalid credentials');
       return {
@@ -72,7 +16,6 @@ class AuthService {
         'email': email,
         'name': 'Mock User',
       };
-      {{/if}}
     }, requiresNetwork: true);
   }
 
@@ -82,113 +25,30 @@ class AuthService {
     required String password,
   }) async {
     return runTask(() async {
-      {{#if (eq backend.provider "firebase")}}
-      final cred = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
-      final user = cred.user;
-      if (user == null) return null;
-      await user.updateDisplayName(name);
-      return {
-        'id': user.uid,
-        'email': user.email,
-        'name': name,
-      };
-      
-      {{else if (eq backend.provider "supabase")}}
-      final response = await _supabaseClient.auth.signUp(
-        email: email,
-        password: password,
-        data: {'name': name},
-      );
-      final user = response.user;
-      if (user == null) return null;
-      return {
-        'id': user.id,
-        'email': user.email,
-        'name': name,
-      };
-      
-      {{else if flags.usesDio}}
-      final result = await DioService.instance.post('/auth/signup', data: {'name': name, 'email': email, 'password': password});
-      return result.fold(
-        (failure) => throw failure,
-        (response) => response.data,
-      );
-      
-      {{else if flags.usesHttp}}
-      final result = await HttpService.instance.post('/auth/signup', body: {'name': name, 'email': email, 'password': password});
-      return result.fold(
-        (failure) => throw failure,
-        (response) => jsonDecode(response.body),
-      );
-      
-      {{else}}
       await Future.delayed(const Duration(seconds: 2));
       return {
         'id': 'mock_123',
         'email': email,
         'name': name,
       };
-      {{/if}}
     }, requiresNetwork: true);
   }
 
   FutureEither<void> forgotPassword({required String email}) async {
     return runTask(() async {
-      {{#if (eq backend.provider "firebase")}}
-      await _firebaseAuth.sendPasswordResetEmail(email: email);
-      {{else if (eq backend.provider "supabase")}}
-      await _supabaseClient.auth.resetPasswordForEmail(email);
-      {{else if flags.usesDio}}
-      final result = await DioService.instance.post('/auth/forgot-password', data: {'email': email});
-      result.fold((failure) => throw failure, (_) => null);
-      {{else if flags.usesHttp}}
-      final result = await HttpService.instance.post('/auth/forgot-password', body: {'email': email});
-      result.fold((failure) => throw failure, (_) => null);
-      {{else}}
       await Future.delayed(const Duration(seconds: 2));
-      {{/if}}
     }, requiresNetwork: true);
   }
 
   FutureEither<void> logout() async {
     return runTask(() async {
-      {{#if (eq backend.provider "firebase")}}
-      await _firebaseAuth.signOut();
-      {{else if (eq backend.provider "supabase")}}
-      await _supabaseClient.auth.signOut();
-      {{else if flags.usesDio}}
-      await DioService.instance.post('/auth/logout').then((res) => res.fold((f) => null, (r) => null));
-      {{else if flags.usesHttp}}
-      await HttpService.instance.post('/auth/logout').then((res) => res.fold((f) => null, (r) => null));
-      {{else}}
       await Future.delayed(const Duration(seconds: 1));
-      {{/if}}
     }, requiresNetwork: true);
   }
 
   FutureEither<Map<String, dynamic>?> getCurrentUser() async {
     return runTask(() async {
-      {{#if (eq backend.provider "firebase")}}
-      final user = _firebaseAuth.currentUser;
-      if (user == null) return null;
-      return {
-        'id': user.uid,
-        'email': user.email,
-        'name': user.displayName,
-        'photoUrl': user.photoURL,
-      };
-      {{else if (eq backend.provider "supabase")}}
-      final session = _supabaseClient.auth.currentSession;
-      if (session == null || session.user == null) return null;
-      final user = session.user!;
-      return {
-        'id': user.id,
-        'email': user.email,
-        'name': user.userMetadata?['name'],
-      };
-      {{else}}
       return null;
-      {{/if}}
     });
   }
 }

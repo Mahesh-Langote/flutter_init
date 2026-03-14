@@ -1,11 +1,12 @@
 import '../utils/utils.dart';
-import 'package:firebase_auth/firebase_auth.dart' as fb;
+import '../config/app_config.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
   AuthService._();
   static final AuthService instance = AuthService._();
 
-  final fb.FirebaseAuth _firebaseAuth = fb.FirebaseAuth.instance;
+  FirebaseAuth get _firebaseAuth => AppConfig.firebaseAuth;
 
   FutureEither<Map<String, dynamic>?> login({
     required String email,

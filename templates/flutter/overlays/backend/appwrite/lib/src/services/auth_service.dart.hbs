@@ -1,24 +1,13 @@
 import '../utils/utils.dart';
+import '../config/app_config.dart';
 import 'package:appwrite/appwrite.dart';
 
 class AuthService {
   AuthService._();
   static final AuthService instance = AuthService._();
 
-  late final Client _client;
-  late final Account _account;
-
-  /// Call this once during app startup (e.g. in main.dart) to initialize the Appwrite client.
-  void init({
-    required String endpoint,
-    required String projectId,
-  }) {
-    _client = Client()
-      ..setEndpoint(endpoint)
-      ..setProject(projectId)
-      ..setSelfSigned(status: true);
-    _account = Account(_client);
-  }
+  Account get _account => AppConfig.appwriteAccount;
+  Client get _client => AppConfig.appwriteClient;
 
   FutureEither<Map<String, dynamic>?> login({
     required String email,

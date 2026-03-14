@@ -1,11 +1,12 @@
 import '../utils/utils.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' as sp;
+import '../config/app_config.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
   AuthService._();
   static final AuthService instance = AuthService._();
 
-  final sp.SupabaseClient _supabaseClient = sp.Supabase.instance.client;
+  SupabaseClient get _supabaseClient => AppConfig.supabase;
 
   FutureEither<Map<String, dynamic>?> login({
     required String email,

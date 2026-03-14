@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../config/app_config.dart';
 import '../utils/utils.dart';
 
 /// A lightweight networking service powered by the http package.
@@ -8,20 +8,12 @@ class HttpService {
   HttpService._();
   static final HttpService instance = HttpService._();
 
-  late final http.Client _client;
-
-  String get _baseUrl => dotenv.get('API_BASE_URL', fallback: '{{#if (eq backend.provider "customRest")}}{{backend.options.baseUrl}}{{else}}https://api.example.com{{/if}}');
-
-  void init() {
-    _client = http.Client();
-  }
-
   // --- HTTP Methods ---
 
   FutureEither<http.Response> get(String path, {Map<String, String>? headers}) {
     return runTask(() async {
-      final response = await _client.get(
-        Uri.parse('$_baseUrl$path'),
+      final response = await AppConfig.httpClient.get(
+        Uri.parse('${AppConfig.baseUrl}$path'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -35,8 +27,8 @@ class HttpService {
 
   FutureEither<http.Response> post(String path, {dynamic body, Map<String, String>? headers}) {
     return runTask(() async {
-      final response = await _client.post(
-        Uri.parse('$_baseUrl$path'),
+      final response = await AppConfig.httpClient.post(
+        Uri.parse('${AppConfig.baseUrl}$path'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -51,8 +43,8 @@ class HttpService {
 
   FutureEither<http.Response> put(String path, {dynamic body, Map<String, String>? headers}) {
     return runTask(() async {
-      final response = await _client.put(
-        Uri.parse('$_baseUrl$path'),
+      final response = await AppConfig.httpClient.put(
+        Uri.parse('${AppConfig.baseUrl}$path'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -67,8 +59,8 @@ class HttpService {
 
   FutureEither<http.Response> delete(String path, {Map<String, String>? headers}) {
     return runTask(() async {
-      final response = await _client.delete(
-        Uri.parse('$_baseUrl$path'),
+      final response = await AppConfig.httpClient.delete(
+        Uri.parse('${AppConfig.baseUrl}$path'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
