@@ -7,7 +7,6 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Switch } from "@/components/ui/switch"
 import { InformationCircleIcon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { StepFooter } from "../StepFooter"
 
 export function LocalizationStep() {
     const { config, updateConfig, next, prev, setSelectedItem } = useWizard()
@@ -103,7 +102,6 @@ export function LocalizationStep() {
                     </div>
                 </div>
             </CardContent>
-            <StepFooter onPrev={prev} onNext={next} />
         </Card>
     )
 }

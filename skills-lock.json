@@ -11,6 +11,16 @@
       "sourceType": "github",
       "computedHash": "fc87b1a02397a9dbcfdff39cdcf627659d433608bafbd347c60049dd2766a227"
     },
+    "shadcn": {
+      "source": "shadcn/ui",
+      "sourceType": "github",
+      "computedHash": "1d61d915437a447176ad9f1d7141f22b163265e64f9fac50267264674068099f"
+    },
+    "ui-ux-pro-max": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "computedHash": "6337038fe1fe6bbe1b9f252ab678ee575859190bab6f0f246f4061824eb40875"
+    },
     "web-design-guidelines": {
       "source": "vercel-labs/agent-skills",
       "sourceType": "github",

@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { InformationCircleIcon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { StepFooter } from "../StepFooter"
 
 export function NavigationStep() {
     const { config, updateConfig, next, prev, setSelectedItem } = useWizard()
@@ -73,7 +72,6 @@ export function NavigationStep() {
                     })}
                 </RadioGroup>
             </CardContent>
-            <StepFooter onPrev={prev} onNext={next} />
         </Card>
     )
 }

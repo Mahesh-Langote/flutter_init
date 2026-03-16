@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { StepFooter } from "../StepFooter"
 import { ToggleRow } from "../ToggleRow"
 import { InformationCircleIcon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
@@ -189,7 +188,6 @@ export function BackendStep() {
                     )}
                 </div>
             </CardContent>
-            <StepFooter onPrev={prev} onNext={next} />
         </Card>
     )
 }

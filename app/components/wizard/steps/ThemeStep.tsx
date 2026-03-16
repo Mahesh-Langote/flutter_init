@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { InformationCircleIcon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { StepFooter } from "../StepFooter"
 
 export function ThemeStep() {
     const { config, updateConfig, next, prev, setSelectedItem } = useWizard()
@@ -123,7 +122,6 @@ export function ThemeStep() {
                     </div>
                 </div>
             </CardContent>
-            <StepFooter onPrev={prev} onNext={next} />
         </Card>
     )
 }

@@ -20,7 +20,6 @@ import {
     WrenchIcon
 } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { StepFooter } from "../StepFooter"
 import { ToggleRow } from "../ToggleRow"
 
 interface Category {
@@ -270,7 +269,6 @@ export function MiscStep() {
                     ))}
                 </Accordion>
             </CardContent>
-            <StepFooter onPrev={prev} onNext={next} />
         </Card>
     )
 }

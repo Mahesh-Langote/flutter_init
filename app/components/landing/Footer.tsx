@@ -89,7 +89,7 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-zinc-100 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2 text-zinc-500 font-medium text-sm">
             <span>© {currentYear} FlutterInit.</span>
             <span className="hidden md:inline">Built with</span>
@@ -100,7 +100,7 @@ export function Footer() {
               target="_blank"
               className="text-zinc-900 font-bold hover:text-primary transition-colors decoration-primary underline-offset-4 hover:underline"
             >
-              Arjun
+              Arjun Mahar
             </Link>
           </div>
 

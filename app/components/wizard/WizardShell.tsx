@@ -5,10 +5,29 @@ import { useWizard } from "@/app/lib/state/useWizardStore"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import * as React from "react"
 import { StepContent } from "./StepContent"
 import { PackageInfoPanel } from "./PackageInfoPanel"
+import { Separator } from "@/components/ui/separator"
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarGroup,
+    SidebarHeader,
+    SidebarInset,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarProvider,
+    SidebarTrigger,
+    useSidebar,
+} from "@/components/ui/sidebar"
+import Image from "next/image"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { ArrowLeft02Icon, ArrowRight02Icon, Tick01Icon } from "@hugeicons/core-free-icons"
 
 const steps: Record<
     StepId,
@@ -64,9 +83,21 @@ export function WizardShell() {
         [stepIndex]
     )
 
+    const handleNext = () => {
+        if (stepIndex < stepOrder.length - 1) {
+            setStep(stepOrder[stepIndex + 1])
+        }
+    }
+
+    const handleBack = () => {
+        if (stepIndex > 0) {
+            setStep(stepOrder[stepIndex - 1])
+        }
+    }
+
     if (!isHydrated) {
         return (
-            <main className="mx-auto flex min-h-screen items-center justify-center p-6 bg-background relative overflow-hidden mt-20">
+            <main className="mx-auto flex min-h-dvh items-center justify-center p-6 bg-background relative overflow-hidden">
                 <div className="absolute inset-0 bg-linear-to-tr from-primary/10 via-background to-background -z-10" />
                 <Card className="w-full max-w-xl border-border/40 bg-background/60 backdrop-blur-xl shadow-2xl">
                     <CardHeader>
@@ -84,109 +115,159 @@ export function WizardShell() {
     }
 
     return (
-        <main className="min-h-screen bg-background relative selection:bg-primary/20">
-            {/* Background Effects */}
-            <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-primary/10 via-background to-background -z-20 pointer-events-none" />
-            <div className="fixed inset-0 bg-[radial-gradient(circle_at_bottom_left,var(--tw-gradient-stops))] from-secondary/20 via-background to-background -z-20 pointer-events-none" />
-            <div className="fixed inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] -z-10 pointer-events-none" />
+        <SidebarProvider style={{ "--sidebar-width": "20rem" } as React.CSSProperties}>
+            <WizardSidebar />
 
-            <div className="mx-auto flex min-h-screen max-w-7xl gap-8 px-6 pt-32 pb-12 lg:gap-16">
-                {/* Sidebar */}
-                <aside className="hidden lg:block w-80 shrink-0 space-y-8 sticky top-12 h-fit">
-                    <div className="flex items-center justify-between">
-                        <h1 className="text-2xl font-bold tracking-tight bg-linear-to-br from-foreground to-muted-foreground bg-clip-text text-transparent">
-                            Setup Wizard
-                        </h1>
-                        <Badge variant="outline" className="bg-background/50 backdrop-blur-sm border-primary/20 text-primary">1.0</Badge>
+            {/* Main Content Area */}
+            <SidebarInset className="min-w-0 relative flex flex-col min-h-dvh">
+                {/* Background Details */}
+                <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-primary/5 via-background/0 to-background/0 -z-20 pointer-events-none" />
+                <div className="fixed inset-0 bg-[radial-gradient(circle_at_bottom_left,var(--tw-gradient-stops))] from-secondary/10 via-background/0 to-background/0 -z-20 pointer-events-none" />
+                <div className="fixed inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] -z-10 pointer-events-none" />
+
+                {/* Top Nav Bar */}
+                <header className="sticky top-0 z-30 flex h-20 shrink-0 items-center justify-between border-b border-border/40 bg-background/80 backdrop-blur-xl px-4 md:px-6">
+                    <div className="flex items-center gap-4 overflow-hidden">
+                        <SidebarTrigger className="-ml-2 text-muted-foreground hover:text-foreground hover:bg-muted" />
+                        <Separator orientation="vertical" className="h-8" />
+
+                        <span className="text-xs md:text-sm font-bold text-muted-foreground uppercase tracking-wider">
+                            Step {stepIndex + 1} of {stepOrder.length}
+                        </span>
                     </div>
 
-                    <div className="space-y-4">
-                        <div className="flex justify-between text-sm text-muted-foreground">
-                            <span>Progress</span>
-                            <span>{Math.round(progress)}%</span>
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-3">
+                        <Button
+                            variant="outline"
+                            onClick={handleBack}
+                            disabled={stepIndex === 0}
+                            className="h-10 px-4 border-border/40 bg-background/50 shadow-sm"
+                        >
+                            <HugeiconsIcon icon={ArrowLeft02Icon} className="size-4 mr-1.5 hidden sm:block" />
+                            <span className="hidden sm:inline">Back</span>
+                            <span className="sm:hidden -mx-0.5">Prev</span>
+                        </Button>
+                        <Button
+                            onClick={handleNext}
+                            disabled={stepIndex === stepOrder.length - 1}
+                            className="h-10 px-5 shadow-sm"
+                        >
+                            {stepIndex === stepOrder.length - 1 ? (
+                                steps[step].actionLabel || "Finish"
+                            ) : (
+                                <>
+                                    <span className="hidden sm:inline">Continue</span>
+                                    <span className="sm:hidden -mx-0.5">Next</span>
+                                    <HugeiconsIcon icon={ArrowRight02Icon} className="size-4 ml-1.5 sm:block" />
+                                </>
+                            )}
+                        </Button>
+                    </div>
+                </header>
+
+                <div className="flex-1 overflow-auto selection:bg-primary/20">
+                    <main className="mx-auto max-w-4xl p-4 sm:p-6 lg:p-10 pb-32">
+                        {/* Step Content Area */}
+                        <div className="relative fade-in animate-in slide-in-from-bottom-2 duration-500">
+                            <StepContent step={step} />
                         </div>
-                        <Progress value={progress} className="h-2 bg-primary/10" />
-                    </div>
+                    </main>
+                </div>
 
-                    <nav className="space-y-1">
+                <PackageInfoPanel />
+            </SidebarInset>
+        </SidebarProvider>
+    )
+}
+
+function WizardSidebar() {
+    const { step, setStep, stepIndex } = useWizard()
+    const { setOpenMobile, isMobile } = useSidebar()
+
+    const progress = React.useMemo(
+        () => Math.round(((stepIndex + 1) / stepOrder.length) * 100),
+        [stepIndex]
+    )
+
+    return (
+        <Sidebar variant="sidebar" className="border-r border-border/40 bg-background/50 backdrop-blur-xl">
+            <SidebarHeader className="p-4 border-b border-border/40">
+                <div className="flex items-center gap-3">
+                    <Image
+                        src="/logo.svg"
+                        alt="Flutter Init Logo"
+                        width={24}
+                        height={24}
+                        className="h-6 w-6"
+                    />
+                    <Badge variant="outline" className="ml-auto bg-background/50 backdrop-blur-sm border-primary/20 text-primary hover:bg-transparent">
+                        1.0
+                    </Badge>
+                </div>
+            </SidebarHeader>
+
+            <SidebarContent className="px-2 py-4 no-scrollbar">
+                <SidebarGroup>
+                    <SidebarMenu>
                         {stepOrder.map((id, index) => {
                             const isActive = id === step
                             const isCompleted = stepOrder.indexOf(id) < stepIndex
 
                             return (
-                                <button
-                                    key={id}
-                                    onClick={() => setStep(id)}
-                                    className={cn(
-                                        "w-full group relative flex items-center gap-3 rounded-xl px-4 py-3 text-left transition-all duration-300",
-                                        isActive
-                                            ? "bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20"
-                                            : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
-                                    )}
-                                >
-                                    <div className={cn(
-                                        "flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold transition-colors border",
-                                        isActive ? "bg-primary text-primary-foreground border-primary" :
-                                            isCompleted ? "bg-muted text-muted-foreground border-transparent group-hover:border-border" : "bg-transparent border-border text-muted-foreground"
-                                    )}>
-                                        {index + 1}
-                                    </div>
-                                    <div className="flex-1">
-                                        <div className="flex items-center justify-between">
-                                            <span className={cn("text-sm font-medium", isActive && "font-bold")}>{steps[id].title}</span>
+                                <SidebarMenuItem key={id}>
+                                    <SidebarMenuButton
+                                        isActive={isActive}
+                                        onClick={() => {
+                                            setStep(id)
+                                            if (isMobile) setOpenMobile(false)
+                                        }}
+                                        size="lg"
+                                        className={cn(
+                                            "w-full justify-start h-auto py-3 px-3 relative transition-all duration-300 rounded-xl",
+                                            isActive ? "bg-primary/10 ring-1 ring-primary/20 text-primary hover:bg-primary/15 hover:text-primary" : "text-muted-foreground hover:bg-muted/50"
+                                        )}
+                                    >
+                                        <div
+                                            className={cn(
+                                                "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold transition-colors border shadow-xs",
+                                                isActive
+                                                    ? "bg-primary text-primary-foreground border-primary"
+                                                    : isCompleted
+                                                        ? "bg-muted text-muted-foreground border-transparent"
+                                                        : "bg-transparent border-input text-muted-foreground"
+                                            )}
+                                        >
+                                            {isCompleted ? <HugeiconsIcon icon={Tick01Icon} className="size-4" strokeWidth={2.5} /> : index + 1}
+                                        </div>
+                                        <div className="flex flex-col items-start min-w-0">
+                                            <span className={cn("text-sm transition-colors", isActive ? "font-bold text-foreground" : "font-medium")}>
+                                                {steps[id].title}
+                                            </span>
+                                            {isActive && (
+                                                <span className="text-xs opacity-80 text-left whitespace-normal leading-snug pt-0.5 animate-in fade-in slide-in-from-top-1 duration-300">
+                                                    {steps[id].description}
+                                                </span>
+                                            )}
                                         </div>
                                         {isActive && (
-                                            <p className="text-xs text-muted-foreground/80 mt-0.5 line-clamp-1 animate-in fade-in slide-in-from-left-1">
-                                                {steps[id].description}
-                                            </p>
+                                            <div className="absolute absolute-y-center left-0 w-1 h-6 bg-primary rounded-r-full -ml-px" />
                                         )}
-                                    </div>
-                                    {isActive && (
-                                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full" />
-                                    )}
-                                </button>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
                             )
                         })}
-                    </nav>
-                </aside>
+                    </SidebarMenu>
+                </SidebarGroup>
+            </SidebarContent>
 
-                {/* Main Content */}
-                <section className="flex-1 min-w-0 space-y-6">
-                    <header className="lg:hidden mb-8">
-                        <div className="flex items-center justify-between mb-4">
-                            <div>
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    Flutter scaffolder
-                                </p>
-                                <p className="text-xl font-bold">Setup Wizard</p>
-                            </div>
-                            <Badge variant="outline">Step {stepIndex + 1}/{stepOrder.length}</Badge>
-                        </div>
-                        <Progress value={progress} className="h-2" />
-                    </header>
-
-                    <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                            <p className="text-sm font-medium text-primary">
-                                Step {stepIndex + 1} of {stepOrder.length}
-                            </p>
-                            <h2 className="text-3xl font-bold tracking-tight text-foreground">
-                                {steps[step].title}
-                            </h2>
-                            <p className="text-lg text-muted-foreground">
-                                {steps[step].description}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="mt-8">
-                        <StepContent step={step} />
-                    </div>
-                </section>
-
-                {/* Right Panel */}
-                <PackageInfoPanel />
-            </div>
-        </main>
+            <SidebarFooter className="p-4 border-t border-border/40">
+                <div className="flex justify-between text-xs font-medium text-muted-foreground mb-2 px-1">
+                    <span>Progress</span>
+                    <span>{Math.round(progress)}%</span>
+                </div>
+                <Progress value={progress} className="h-2 bg-muted/50" />
+            </SidebarFooter>
+        </Sidebar>
     )
 }

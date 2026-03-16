@@ -2,7 +2,6 @@
 
 import { useWizard } from "@/app/lib/state/useWizardStore"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { StepFooter } from "../StepFooter"
 import { ToggleRow } from "../ToggleRow"
 
 export function IconsStep() {
@@ -70,7 +69,6 @@ export function IconsStep() {
                     Selected: <span className="font-medium text-foreground/90">{selectedIcons}</span>
                 </p>
             </CardContent>
-            <StepFooter onPrev={prev} onNext={next} />
         </Card>
     )
 }

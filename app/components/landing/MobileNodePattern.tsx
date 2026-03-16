@@ -48,7 +48,7 @@ export function MobileNodePattern() {
             ? 'bg-white border-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-primary/5'
             : 'bg-white/70 hover:bg-white/95 border-white/40 shadow-zinc-200/20'}
         `}>
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 border ${active ? bgClass + ' border-white/20 shadow-sm' : 'bg-zinc-100 border-zinc-200'}`}>
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 border ${active ? bgClass + ' border-white/20 shadow-sm' : 'bg-zinc-100 border-zinc-200'}`}>
             <HugeiconsIcon icon={Icon} size={20} className={`transition-colors duration-300 ${active ? 'text-white' : 'text-zinc-400'}`} />
           </div>
 
@@ -58,6 +58,7 @@ export function MobileNodePattern() {
 
           <div onClick={(e) => e.stopPropagation()}>
             <Switch
+              size='sm'
               checked={active}
               onCheckedChange={() => toggleNode(stateKey)}
               className={`cursor-pointer transition-colors duration-300 ${active ? 'data-[state=checked]:bg-primary' : ''}`}
@@ -98,33 +99,29 @@ export function MobileNodePattern() {
 
         {/* Vertical Backbone */}
         <path 
-          d="M 200 100 L 200 550" 
+          d="M 200 200 L 200 450" 
           className="stroke-zinc-200 stroke-2"
         />
         <path 
-          d="M 200 100 L 200 550" 
+          d="M 200 200 L 200 450" 
           className="stroke-zinc-200/50 stroke-2 flow-line-mob"
           filter="url(#glow-mob)"
         />
 
-        {/* Top Branches (GoRouter, Riverpod, Supabase) connecting to Center (y=325) */}
+        {/* Top Branches (Riverpod, Supabase) connecting to Center (y=325) */}
         <g className="stroke-zinc-200 stroke-2">
           {/* Riverpod (Top Left) */}
           <path d="M 100 100 C 100 180, 200 180, 200 325" />
           {/* Supabase (Top Right) */}
           <path d="M 300 100 C 300 180, 200 180, 200 325" />
-          {/* GoRouter (Top Center) */}
-          <path d="M 200 200 L 200 325" />
         </g>
 
-        {/* Bottom Branches (Firebase, Dio, Bloc) connecting from Center (y=325) */}
+        {/* Bottom Branches (Firebase, Dio) connecting from Center (y=325) */}
         <g className="stroke-zinc-200 stroke-2">
           {/* Firebase (Bottom Left) */}
           <path d="M 200 325 C 200 450, 100 450, 100 550" />
           {/* Dio (Bottom Right) */}
           <path d="M 200 325 C 200 450, 300 450, 300 550" />
-          {/* Bloc (Bottom Center) */}
-          <path d="M 200 325 L 200 450" />
         </g>
 
         {/* Brand Dots at Node positions */}
@@ -173,21 +170,21 @@ export function MobileNodePattern() {
       {/* Top Nodes */}
       <NodeSwitch
         stateKey="riverpod"
-        top="100px" left="100px"
+        top="100px" left="80px"
         bgClass="bg-linear-to-tr from-blue-600 to-blue-400 shadow-blue-500/25"
         Icon={WaveIcon}
         label="Riverpod"
       />
       <NodeSwitch
         stateKey="supabase"
-        top="100px" left="300px"
+        top="100px" left="270px"
         bgClass="bg-linear-to-tr from-emerald-500 to-green-400 shadow-emerald-500/25"
         Icon={Database01Icon}
         label="Supabase"
       />
       <NodeSwitch
         stateKey="goRouter"
-        top="200px" left="200px"
+        top="200px" left="170px"
         bgClass="bg-linear-to-tr from-rose-500 to-pink-400 shadow-rose-500/25"
         Icon={Route01Icon}
         label="GoRouter"
@@ -196,21 +193,21 @@ export function MobileNodePattern() {
       {/* Bottom Nodes */}
       <NodeSwitch
         stateKey="bloc"
-        top="450px" left="200px"
+        top="450px" left="170px"
         bgClass="bg-linear-to-tr from-indigo-500 to-purple-400 shadow-indigo-500/25"
         Icon={Package01Icon}
         label="Bloc"
       />
       <NodeSwitch
         stateKey="firebase"
-        top="550px" left="100px"
+        top="550px" left="85px"
         bgClass="bg-linear-to-tr from-orange-500 to-amber-400 shadow-orange-500/25"
         Icon={FireIcon}
         label="Firebase"
       />
       <NodeSwitch
         stateKey="dio"
-        top="550px" left="300px"
+        top="550px" left="280px"
         bgClass="bg-linear-to-tr from-cyan-500 to-sky-400 shadow-cyan-500/25"
         Icon={Unlink01Icon}
         label="Dio"
