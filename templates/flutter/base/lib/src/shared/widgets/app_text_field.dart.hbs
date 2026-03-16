@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import '../../imports/imports.dart';
 
 /// A themed text form field wrapping [TextFormField].
 ///
@@ -56,8 +56,8 @@ class AppTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
+    final cs = context.theme.colorScheme;
+    final tt = context.theme.textTheme;
 
     return TextFormField(
       controller: controller,

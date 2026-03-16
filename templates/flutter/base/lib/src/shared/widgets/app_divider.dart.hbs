@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import '../../imports/imports.dart';
 
 /// A themed horizontal divider using [ColorScheme.outlineVariant].
 ///
@@ -44,7 +44,7 @@ class AppDivider extends StatelessWidget {
       thickness: thickness,
       indent: indent,
       endIndent: endIndent,
-      color: color ?? Theme.of(context).colorScheme.outlineVariant,
+      color: color ?? context.theme.colorScheme.outlineVariant,
     );
   }
 }
@@ -82,7 +82,7 @@ class AppVerticalDivider extends StatelessWidget {
       thickness: thickness,
       indent: indent,
       endIndent: endIndent,
-      color: color ?? Theme.of(context).colorScheme.outlineVariant,
+      color: color ?? context.theme.colorScheme.outlineVariant,
     );
   }
 }

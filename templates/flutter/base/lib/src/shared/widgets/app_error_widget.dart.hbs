@@ -26,8 +26,8 @@ class AppErrorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
+    final cs = context.theme.colorScheme;
+    final tt = context.theme.textTheme;
 
     return Center(
       child: Padding(

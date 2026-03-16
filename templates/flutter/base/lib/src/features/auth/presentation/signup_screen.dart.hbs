@@ -44,9 +44,6 @@ class SignupScreen extends HookWidget {
   @override
   Widget build(BuildContext context) {
 {{/if}}
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
 
     final GlobalKey<FormState> formKey =
         useMemoized(() => GlobalKey<FormState>());
@@ -373,7 +370,7 @@ class _SignupView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final theme = context.theme;
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
@@ -689,7 +686,7 @@ class _SocialButton extends StatelessWidget {
         height: {{res 48 'h' flags.usesScreenutil}},
         width: {{res 48 'w' flags.usesScreenutil}},
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
+          color: context.theme.colorScheme.surface,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(

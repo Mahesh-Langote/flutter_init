@@ -102,7 +102,7 @@ class AppCachedImage extends StatelessWidget {
           width: width,
           height: height,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            color: context.theme.colorScheme.surfaceContainerHighest,
             borderRadius: borderRadius,
           ),
         ),
@@ -118,7 +118,7 @@ class AppCachedImage extends StatelessWidget {
     return Container(
       width: width,
       height: height,
-      color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
+      color: context.theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
       child: const Center(
         child: CircularProgressIndicator(strokeWidth: 2),
       ),
@@ -129,28 +129,28 @@ class AppCachedImage extends StatelessWidget {
     return Container(
       width: width,
       height: height,
-      color: Theme.of(context).colorScheme.errorContainer.withOpacity(0.3),
+      color: context.theme.colorScheme.errorContainer.withOpacity(0.3),
       child: Center(
         child: {{#if flags.usesHugeicons}}
           HugeIcon(
             icon: HugeIcons.strokeRoundedImageNotFound02,
-            color: Theme.of(context).colorScheme.error,
+            color: context.theme.colorScheme.error,
             size: 24,
           )
         {{else if flags.usesIconsaxPlus}}
           Icon(
             IconsaxPlusBold.image,
-            color: Theme.of(context).colorScheme.error,
+            color: context.theme.colorScheme.error,
           )
         {{else if flags.usesFlutterRemix}}
           Icon(
             FlutterRemix.image_line,
-            color: Theme.of(context).colorScheme.error,
+            color: context.theme.colorScheme.error,
           )
         {{else}}
           Icon(
             Icons.broken_image_outlined,
-            color: Theme.of(context).colorScheme.error,
+            color: context.theme.colorScheme.error,
           )
         {{/if}},
       ),

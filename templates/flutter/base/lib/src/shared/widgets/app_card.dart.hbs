@@ -1,8 +1,4 @@
-import 'package:flutter/material.dart';
-
-import '../../theme/app_borders.dart';
-import '../../theme/app_shadows.dart';
-import '../../theme/app_spacing.dart';
+import '../../imports/imports.dart';
 
 /// A themed card widget with consistent padding, radius, and optional header.
 ///
@@ -49,8 +45,8 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
+    final cs = context.theme.colorScheme;
+    final tt = context.theme.textTheme;
 
     final cardColor = color ?? cs.surfaceContainerLow;
 
@@ -60,7 +56,7 @@ class AppCard extends StatelessWidget {
       children: [
         if (title != null || leading != null || trailing != null)
           Padding(
-            padding: EdgeInsets.only(
+            padding: const EdgeInsets.only(
               left: AppSpacing.md,
               right: AppSpacing.md,
               top: AppSpacing.md,

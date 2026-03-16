@@ -1,13 +1,4 @@
-import 'package:flutter/material.dart';
-{{#if flags.usesScreenutil}}
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-{{/if}}
-
-import '../../theme/app_borders.dart';
-import '../../theme/app_durations.dart';
-import '../../theme/app_curves.dart';
-import '../../theme/color_schemes.dart';
-import '../enums/button_enums.dart';
+import '../../imports/imports.dart';
 
 /// A fully themed button supporting all [ButtonVariant]s and [ButtonSize]s.
 ///
@@ -47,8 +38,8 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final appColors = Theme.of(context).extension<AppColorsExtension>()!;
+    final cs = context.theme.colorScheme;
+    final appColors = context.theme.extension<AppColorsExtension>()!;
     final isDisabled = onPressed == null || isLoading;
 
     final buttonHeight = switch (height) {
