@@ -83,7 +83,6 @@ export function GenerateStep() {
                             config.misc.usesUrlLauncher && "Url Launcher",
                             config.misc.usesPermissionHandler && "Permissions",
                             config.misc.usesDeviceInfoPlus && "Device Info",
-                            config.misc.usesPackageInfoPlus && "Package Info",
                             config.misc.usesAppVersionUpdate && "App Version",
                             config.misc.usesDotenv && "Dotenv",
 

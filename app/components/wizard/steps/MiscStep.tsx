@@ -175,9 +175,9 @@ export function MiscStep() {
                     description: "Get detailed hardware and software information"
                 },
                 {
-                    key: "usesPackageInfoPlus",
-                    label: "Package Info",
-                    description: "Read app version, build number, and bundle ID"
+                    key: "usesAppVersionUpdate",
+                    label: "App Version Update",
+                    description: "Check for updates and prompt user to update the app"
                 }
             ]
         },

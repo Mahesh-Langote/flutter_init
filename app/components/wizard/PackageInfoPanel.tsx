@@ -1,15 +1,17 @@
 "use client"
 
 import { useWizard } from "@/app/lib/state/useWizardStore"
-import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { InformationCircleIcon, LinkSquare02Icon, PackageIcon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 import Link from "next/link"
+import { useEffect, useState } from "react"
+import { fetchPackageMetrics } from "@/app/actions/pub"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const PACKAGE_INFO: Record<string, {
     title: string;
-    description: string;
+    description?: string;
     packageName?: string;
     version?: string;
     publisher?: string;
@@ -20,144 +22,55 @@ const PACKAGE_INFO: Record<string, {
 }> = {
     riverpod: {
         title: "Riverpod",
-        description: "A reactive caching and data-binding framework. Riverpod makes working with asynchronous code a breeze.",
         packageName: "flutter_riverpod",
-        version: "3.3.1",
-        publisher: "dash-overflow.net",
-        likes: 2836,
-        points: 140,
-        downloads: 1464175,
-        url: "https://pub.dev/packages/flutter_riverpod"
     },
     bloc: {
         title: "Bloc",
-        description: "A predictable state management library that helps implement the BLoC design pattern. Widely used in enterprise.",
         packageName: "flutter_bloc",
-        version: "8.1.5",
-        publisher: "bloclibrary.dev",
-        likes: 5431,
-        points: 160,
-        downloads: 8464175,
-        url: "https://pub.dev/packages/flutter_bloc"
     },
     getx: {
         title: "GetX",
-        description: "An extra-light and powerful solution for Flutter. It combines high-performance state management, intelligent dependency injection, and route management quickly.",
         packageName: "get",
-        version: "4.6.6",
-        publisher: "jonataslaw",
-        likes: 12154,
-        points: 140,
-        downloads: 12064175,
-        url: "https://pub.dev/packages/get"
     },
     provider: {
         title: "Provider",
-        description: "A wrapper around InheritedWidget to make them easier to use and more reusable. Recommended by Google.",
         packageName: "provider",
-        version: "6.1.2",
-        publisher: "dash-overflow.net",
-        likes: 8021,
-        points: 140,
-        downloads: 10464175,
-        url: "https://pub.dev/packages/provider"
     },
     mobx: {
         title: "MobX",
-        description: "Supercharge the state-management in your apps with Transparent Functional Reactive Programming (TFRP).",
         packageName: "flutter_mobx",
-        version: "2.2.1",
-        publisher: "mobx.netlify.app",
-        likes: 1354,
-        points: 140,
-        downloads: 946417,
-        url: "https://pub.dev/packages/flutter_mobx"
     },
     go_router: {
         title: "go_router",
-        description: "A declarative routing package for Flutter that uses the Router API to provide a convenient, url-based API for navigating between different screens.",
         packageName: "go_router",
-        version: "13.2.0",
-        publisher: "flutter.dev",
-        likes: 4721,
-        points: 140,
-        downloads: 6464175,
-        url: "https://pub.dev/packages/go_router"
     },
     auto_route: {
         title: "auto_route",
-        description: "AutoRoute is a declarative routing solution, where everything needed for navigation is automatically generated for you.",
         packageName: "auto_route",
-        version: "7.8.4",
-        publisher: "milad-akarie",
-        likes: 2577,
-        points: 140,
-        downloads: 1464175,
-        url: "https://pub.dev/packages/auto_route"
     },
     firebase: {
         title: "Firebase",
-        description: "A comprehensive app development platform that provides backend services, including authentication, database, storage, and analytics.",
         packageName: "firebase_core",
-        version: "2.25.4",
-        publisher: "flutter.dev",
-        likes: 3121,
-        points: 140,
-        downloads: 8464175,
-        url: "https://pub.dev/packages/firebase_core"
     },
     supabase: {
         title: "Supabase",
-        description: "An open source Firebase alternative providing a Postgres database, Authentication, instant APIs, Edge Functions, and Storage.",
         packageName: "supabase_flutter",
-        version: "2.3.1",
-        publisher: "supabase.io",
-        likes: 1845,
-        points: 140,
-        downloads: 946417,
-        url: "https://pub.dev/packages/supabase_flutter"
     },
     appwrite: {
         title: "Appwrite",
-        description: "Appwrite is an open-source backend-as-a-service that abstracts web and mobile development, providing a set of scalable REST APIs.",
         packageName: "appwrite",
-        version: "11.0.1",
-        publisher: "appwrite.io",
-        likes: 934,
-        points: 140,
-        downloads: 246417,
-        url: "https://pub.dev/packages/appwrite"
     },
     iconsax_plus: {
         title: "Iconsax Plus",
-        description: "Iconsax are the official icons of the Vuesax framework, these icons can be used for personal and commercial use for free",
         packageName: "iconsax_plus",
-        version: "1.0.0",
-        likes: 45,
-        points: 150,
-        downloads: 5029,
-        url: "https://pub.dev/packages/iconsax_plus"
     },
     flutter_remix: {
         title: "Flutter Remix",
-        description: "The complete Remix Icon pack available as Flutter Icons. This package acts as a more attractive replacement for the default Material icon set.",
         packageName: "flutter_remix",
-        version: "0.0.3",
-        likes: 59,
-        points: 150,
-        downloads: 832,
-        url: "https://pub.dev/packages/flutter_remix"
     },
     hugeicons: {
         title: "Hugeicons",
-        description: "4,700+ Free Flutter Icons with automatic theme color inheritance and dark mode support. Created by Hugeicons Pro Icon Library. The most beautiful icon library for developers.",
         packageName: "hugeicons",
-        version: "1.1.5",
-        publisher: "hugeicons.com",
-        likes: 409,
-        points: 150,
-        downloads: 22489,
-        url: "https://pub.dev/packages/hugeicons"
     },
     default_flutter_icons: {
         title: "Default Flutter Icons",
@@ -177,7 +90,7 @@ const PACKAGE_INFO: Record<string, {
     },
     mvvm: {
         title: "MVVM Architecture",
-        description: "Model-View-ViewModel architecture. Highly compatible with data-binding. Great for declarative UIs."
+        description: "Model-View-ViewModel architecture. Highly compatible with data-binding. Great for declarative UIs. In FlutterInit, this utilizes ViewModels (via Providers or Blocs) to handle presentation logic and cleanly supplies state to Views without a specific external package."
     },
     "layer-first": {
         title: "Layer-first Architecture",
@@ -251,13 +164,47 @@ const PACKAGE_INFO: Record<string, {
 
 export function PackageInfoPanel() {
     const { selectedItem, setSelectedItem } = useWizard()
+    const [fetchedMetrics, setFetchedMetrics] = useState<any>(null)
+    const [isLoading, setIsLoading] = useState(false)
 
     const open = !!selectedItem
 
-    const info = selectedItem ? PACKAGE_INFO[selectedItem] || {
+    const staticInfo = selectedItem ? PACKAGE_INFO[selectedItem] || {
         title: selectedItem.charAt(0).toUpperCase() + selectedItem.slice(1).replace(/_/g, " "),
         description: "Specific details for this choice have not been provided.",
     } : PACKAGE_INFO['none'];
+
+    useEffect(() => {
+        if (open && staticInfo.packageName) {
+            setIsLoading(true)
+            fetchPackageMetrics(staticInfo.packageName).then((data) => {
+                if (data) {
+                    setFetchedMetrics(data)
+                } else {
+                    setFetchedMetrics(null)
+                }
+                setIsLoading(false)
+            }).catch(() => {
+                setFetchedMetrics(null)
+                setIsLoading(false)
+            })
+        } else {
+            setFetchedMetrics(null)
+            setIsLoading(false)
+        }
+    }, [open, staticInfo.packageName])
+
+    const info = {
+        title: staticInfo.title,
+        description: fetchedMetrics?.description || staticInfo.description,
+        packageName: staticInfo.packageName,
+        version: fetchedMetrics?.version || staticInfo.version,
+        publisher: fetchedMetrics?.publisher || staticInfo.publisher,
+        likes: fetchedMetrics?.likes || staticInfo.likes,
+        points: fetchedMetrics?.points || staticInfo.points,
+        downloads: fetchedMetrics?.downloads || staticInfo.downloads,
+        url: staticInfo.packageName ? `https://pub.dev/packages/${staticInfo.packageName}` : staticInfo.url,
+    }
 
     return (
         <Dialog open={open} onOpenChange={(isOpen) => {
@@ -291,45 +238,65 @@ export function PackageInfoPanel() {
                     </DialogHeader>
 
                     <div className="w-full h-px bg-linear-to-r from-border/10 via-border/60 to-border/10" />
-                    
+
                     <div className="space-y-8">
-                        <p className="text-[15px] font-medium text-foreground/80 leading-relaxed tracking-wide">
-                            {info.description}
-                        </p>
+                        {isLoading && info.packageName ? (
+                            <div className="space-y-3">
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-[90%]" />
+                                <Skeleton className="h-4 w-[80%]" />
+                            </div>
+                        ) : (
+                            <p className="text-[15px] font-medium text-foreground/80 leading-relaxed tracking-wide">
+                                {info.description}
+                            </p>
+                        )}
 
                         {info.packageName && (
                             <div className="grid grid-cols-2 gap-3">
-                                {info.version && (
-                                    <div className="flex flex-col gap-1.5 p-3.5 rounded-2xl bg-card border border-border/50 shadow-sm transition-colors group">
-                                        <span className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase group-hover:text-primary transition-colors">Version</span>
-                                        <span className="font-mono text-sm font-semibold text-foreground/90">{info.version}</span>
-                                    </div>
-                                )}
-                                {info.points && (
-                                    <div className="flex flex-col gap-1.5 p-3.5 rounded-2xl bg-card border border-border/50 shadow-sm transition-colors group">
-                                        <span className="text-[10px] font-bold tracking-widest text-muted-foreground uppercasey transition-colors">Pub points</span>
-                                        <span className="font-mono text-sm font-semibold text-foreground/90">{info.points}/160</span>
-                                    </div>
-                                )}
-                                {info.likes && (
-                                    <div className="flex flex-col gap-1.5 p-3.5 rounded-2xl bg-card border border-border/50 shadow-sm transition-colors group">
-                                        <span className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase transition-colors">Likes</span>
-                                        <span className="text-sm font-bold text-foreground/90">{info.likes.toLocaleString()}</span>
-                                    </div>
-                                )}
-                                {info.downloads && (
-                                    <div className="flex flex-col gap-1.5 p-3.5 rounded-2xl bg-card border border-border/50 shadow-sm transition-colors group">
-                                        <span className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase transition-colors">Downloads</span>
-                                        <span className="text-sm font-bold text-foreground/90">{info.downloads.toLocaleString()}</span>
-                                    </div>
-                                )}
-                                {info.publisher && (
-                                    <div className="flex flex-col gap-1.5 p-3.5 rounded-2xl bg-card border border-border/50 shadow-sm transition-colors col-span-2 group">
-                                        <span className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase transition-colors">Publisher</span>
-                                        <span className="text-sm font-semibold text-primary/90">
-                                            {info.publisher}
-                                        </span>
-                                    </div>
+                                {isLoading ? (
+                                    <>
+                                        <Skeleton className="h-[68px] w-full rounded-2xl" />
+                                        <Skeleton className="h-[68px] w-full rounded-2xl" />
+                                        <Skeleton className="h-[68px] w-full rounded-2xl" />
+                                        <Skeleton className="h-[68px] w-full rounded-2xl" />
+                                        <Skeleton className="h-[68px] w-full rounded-2xl col-span-2" />
+                                    </>
+                                ) : (
+                                    <>
+                                        {info.version && (
+                                            <div className="flex flex-col gap-1.5 p-3.5 rounded-2xl bg-card border border-border/50 shadow-sm transition-colors group">
+                                                <span className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase group-hover:text-primary transition-colors">Version</span>
+                                                <span className="font-mono text-sm font-semibold text-foreground/90">{info.version}</span>
+                                            </div>
+                                        )}
+                                        {info.points && (
+                                            <div className="flex flex-col gap-1.5 p-3.5 rounded-2xl bg-card border border-border/50 shadow-sm transition-colors group">
+                                                <span className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase transition-colors">Pub points</span>
+                                                <span className="font-mono text-sm font-semibold text-foreground/90">{info.points}/160</span>
+                                            </div>
+                                        )}
+                                        {info.likes && (
+                                            <div className="flex flex-col gap-1.5 p-3.5 rounded-2xl bg-card border border-border/50 shadow-sm transition-colors group">
+                                                <span className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase transition-colors">Likes</span>
+                                                <span className="text-sm font-bold text-foreground/90">{info.likes.toLocaleString()}</span>
+                                            </div>
+                                        )}
+                                        {info.downloads && (
+                                            <div className="flex flex-col gap-1.5 p-3.5 rounded-2xl bg-card border border-border/50 shadow-sm transition-colors group">
+                                                <span className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase transition-colors">Downloads</span>
+                                                <span className="text-sm font-bold text-foreground/90">{info.downloads.toLocaleString()}</span>
+                                            </div>
+                                        )}
+                                        {info.publisher && (
+                                            <div className="flex flex-col gap-1.5 p-3.5 rounded-2xl bg-card border border-border/50 shadow-sm transition-colors col-span-2 group">
+                                                <span className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase transition-colors">Publisher</span>
+                                                <span className="text-sm font-semibold text-primary/90">
+                                                    {info.publisher}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </>
                                 )}
                             </div>
                         )}

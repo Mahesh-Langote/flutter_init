@@ -145,7 +145,6 @@ const miscSchema = z.object({
     usesPermissionHandler: z.boolean(),
     // Device
     usesDeviceInfoPlus: z.boolean(),
-    usesPackageInfoPlus: z.boolean(),
     usesAppVersionUpdate: z.boolean(),
 })
 export type MiscConfig = z.infer<typeof miscSchema>
@@ -192,7 +191,6 @@ export const scaffoldConfigSchema = z.object({
         usesSharePlus: false,
         usesPermissionHandler: true,
         usesDeviceInfoPlus: true,
-        usesPackageInfoPlus: false,
         usesAppVersionUpdate: true,
 
     }),
@@ -261,7 +259,6 @@ export const defaultConfig: ScaffoldConfig = {
         usesSharePlus: false,
         usesPermissionHandler: true,
         usesDeviceInfoPlus: true,
-        usesPackageInfoPlus: false,
         usesAppVersionUpdate: true,
 
     },

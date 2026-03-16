@@ -50,7 +50,6 @@ type TemplateContext = ScaffoldConfig & {
         usesPermissionHandler: boolean
         usesUrlLauncher: boolean
         usesDeviceInfoPlus: boolean
-        usesPackageInfoPlus: boolean
         usesAppVersionUpdate: boolean
     }
 }
@@ -154,7 +153,6 @@ function buildTemplateContext(config: ScaffoldConfig): TemplateContext {
             usesPermissionHandler: config.misc.usesPermissionHandler,
             usesUrlLauncher: config.misc.usesUrlLauncher,
             usesDeviceInfoPlus: config.misc.usesDeviceInfoPlus,
-            usesPackageInfoPlus: config.misc.usesPackageInfoPlus,
             usesAppVersionUpdate: config.misc.usesAppVersionUpdate,
         },
     }
