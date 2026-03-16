@@ -113,7 +113,7 @@ export function WhyFlutterInit() {
                   {feature.icon}
                 </div>
 
-                <h3 className="text-2xl font-semibold text-zinc-900 mb-3 group-hover:text-primary transition-colors tracking-tight">
+                <h3 className="text-xl md:text-2xl font-bold text-zinc-900 mb-3 group-hover:text-primary transition-colors tracking-tight">
                   {feature.title}
                 </h3>
 
