@@ -68,6 +68,15 @@ export function WizardProvider({ children }: { children: React.ReactNode }) {
         if (!isHydrated) return
         try {
             window.localStorage.setItem(STORAGE_KEY, JSON.stringify(config))
+            
+            // Sync with dev script if in development
+            if (process.env.NODE_ENV === "development") {
+                fetch("/api/dev/sync-config", {
+                    method: "POST",
+                    body: JSON.stringify(config),
+                    headers: { "Content-Type": "application/json" }
+                }).catch(() => { /* Silent failure - script might not be running or API failed */ })
+            }
         } catch {
             // ignore write errors (storage full or unavailable)
         }

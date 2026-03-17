@@ -19,10 +19,16 @@ Future<void> main() async {
   await AppConfig.init();
 
   runApp(
-    LocalizationWrapper(
-      child: StateWrapper(
-        child: const App(),
-      ),
+    {{#if flags.supportsLocalization}}
+    const LocalizationWrapper(
+      child: {{#if (eq stateManagement "none")}}App(){{else}}StateWrapper(
+        child: App(),
+      ){{/if}},
     ),
+    {{else}}
+    {{#if (eq stateManagement "none")}}const App(){{else}}const StateWrapper(
+      child: App(),
+    ){{/if}},
+    {{/if}}
   );
 }

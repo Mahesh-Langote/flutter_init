@@ -43,3 +43,7 @@ next-env.d.ts
 # Agents
 .agents/
 .agent/
+
+# Generator Output
+/dev_out/
+scripts/dev_config.json

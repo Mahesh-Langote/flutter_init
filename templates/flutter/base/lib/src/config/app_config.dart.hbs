@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-import '../utils/utils.dart';
 {{#if flags.usesDio}}
 import 'package:dio/dio.dart';
 {{/if}}
@@ -25,27 +23,21 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AppConfig {
   AppConfig._();
-
   {{#if flags.usesDio}}
   static late final Dio dio;
   {{/if}}
-
   {{#if flags.usesHttp}}
   static late final http.Client httpClient;
   {{/if}}
-
   {{#if (eq backend.provider "supabase")}}
   static late final SupabaseClient supabase;
   {{/if}}
-
   {{#if (eq backend.provider "appwrite")}}
   static late final Client appwriteClient;
   static late final Account appwriteAccount;
   {{/if}}
-
   {{#if (eq backend.provider "firebase")}}
   static FirebaseAuth get firebaseAuth => FirebaseAuth.instance;
-  
   {{#if backend.options.firestore}}
   static FirebaseFirestore get firestore => FirebaseFirestore.instance;
   {{/if}}
@@ -63,7 +55,6 @@ class AppConfig {
     {{#if (eq backend.provider "firebase")}}
     await Firebase.initializeApp();
     {{/if}}
-
     {{#if (eq backend.provider "supabase")}}
     await Supabase.initialize(
       {{#if flags.usesDotenv}}
@@ -82,7 +73,6 @@ class AppConfig {
     );
     supabase = Supabase.instance.client;
     {{/if}}
-
     {{#if (eq backend.provider "appwrite")}}
     appwriteClient = Client()
       {{#if flags.usesDotenv}}
@@ -101,7 +91,6 @@ class AppConfig {
       ..setSelfSigned(status: true);
     appwriteAccount = Account(appwriteClient);
     {{/if}}
-
     {{#if flags.usesDio}}
     dio = Dio(
       BaseOptions(

@@ -96,6 +96,7 @@ This repository is built on the principle of **Contribution Based Evolution**. W
 
 - **Submit Patterns**: Add your favorite architectural patterns to our `templates/` directory.
 - **Refine the Core**: Improve the Web Dashboard UI.
+- **Developing Templates**: Learn how to test and debug templates in real-time. [Read the Dev Guide](docs/template-development.md).
 - **Documentation**: Help us make the onboarding experience even smoother.
 
 > [!TIP]

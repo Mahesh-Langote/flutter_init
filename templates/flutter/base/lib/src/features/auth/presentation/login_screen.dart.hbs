@@ -5,668 +5,398 @@ import '../../../imports/imports.dart';
 import '../../../routing/app_routes.dart';
 
 {{#if flags.isRiverpod}}
-{{#if flags.usesFlutterHooks}}
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-{{else}}
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-{{/if}}
 import '../application/auth_provider.dart';
 {{else if flags.isBloc}}
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../application/auth_bloc.dart';
 {{else if flags.isProvider}}
-import 'package:provider/provider.dart';
 import '../application/auth_provider.dart';
 {{else if flags.isGetX}}
-import 'package:get/get.dart';
 import '../application/auth_controller.dart';
 {{else if flags.isMobX}}
-import 'package:provider/provider.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import '../application/auth_store.dart';
 {{/if}}
 
 {{#if (eq flags.routerPackage "auto_route")}}
 @RoutePage()
 {{/if}}
-{{#if flags.usesFlutterHooks}}
-{{#if flags.isRiverpod}}
-class LoginScreen extends HookConsumerWidget {
-{{else}}
-class LoginScreen extends HookWidget {
-{{/if}}
+{{#if (or flags.isRiverpod flags.isBloc flags.isProvider flags.isGetX flags.isMobX flags.usesFlutterHooks)}}
+class LoginScreen extends {{#if (and flags.isRiverpod flags.usesFlutterHooks)}}HookConsumerWidget{{else if flags.isRiverpod}}ConsumerWidget{{else if flags.usesFlutterHooks}}HookWidget{{else}}StatelessWidget{{/if}} {
   const LoginScreen({super.key});
 
-{{#if flags.isRiverpod}}
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-{{else}}
-  @override
-  Widget build(BuildContext context) {
-{{/if}}
-
+  Widget build(BuildContext context{{#if flags.isRiverpod}}, WidgetRef ref{{/if}}) {
+    {{#if flags.usesFlutterHooks}}
     final GlobalKey<FormState> formKey =
         useMemoized(() => GlobalKey<FormState>());
     final emailController = useTextEditingController();
     final passwordController = useTextEditingController();
     final obscurePassword = useState(true);
-    final rememberMe = useState(false);
-{{#if flags.isRiverpod}}
+    {{else}}
+    final formKey = GlobalKey<FormState>();
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    const obscurePassword = true;
+    {{/if}}
+
+    {{#if flags.isRiverpod}}
     final isLoading = ref.watch(authControllerProvider);
-    final String? errorMessage = null; // Error handled by snackbar in Controller
-{{else if flags.isBloc}}
+    {{else if flags.isBloc}}
     final isLoading = context.select((AuthBloc bloc) => bloc.state.isLoading);
     final errorMessage = context.select((AuthBloc bloc) => bloc.state.errorMessage);
-{{else if flags.isProvider}}
+    {{else if flags.isProvider}}
     final isLoading = context.select((AuthProvider p) => p.isLoading);
     final errorMessage = context.select((AuthProvider p) => p.errorMessage);
-{{else if flags.isGetX}}
-    final AuthController authController = Get.find<AuthController>();
-    final isLoadingState = useStream(authController.isLoading.stream);
-    final isLoading = isLoadingState.data ?? false;
-    final errorMessageState = useStream(authController.errorMessage.stream);
-    final errorMessage = errorMessageState.data;
-{{else}}
+    {{else if flags.isGetX}}
+    final controller = Get.find<AuthController>();
+    final isLoading = controller.isLoading.value;
+    final errorMessage = controller.errorMessage.value;
+    {{else if flags.usesFlutterHooks}}
     final isLoadingState = useState(false);
-    final errorMessageState = useState<String?>(null);
     final isLoading = isLoadingState.value;
-    final errorMessage = errorMessageState.value;
-{{/if}}
+    {{else}}
+    final isLoading = false;
+    {{/if}}
 
-    Future<void> onLogin() async {
-      if (formKey.currentState?.validate() ?? false) {
-        {{#if flags.isRiverpod}}
-        {{else if flags.isBloc}}
-        {{else if flags.isProvider}}
-        {{else if flags.isGetX}}
-        {{else}}
-        isLoadingState.value = true;
-        errorMessageState.value = null;
+    final cs = context.theme.colorScheme;
+    final tt = context.theme.textTheme;
+
+    Future<void> handleLogin() async {
+      if (!(formKey.currentState?.validate() ?? false)) return;
+
+      {{#if flags.isRiverpod}}
+      ref.read(authControllerProvider.notifier).login(
+        context: context, 
+        email: emailController.text, 
+        password: passwordController.text,
+      );
+      {{else if flags.isBloc}}
+      context.read<AuthBloc>().add(
+        LoginRequested(
+          context: context, 
+          email: emailController.text, 
+          password: passwordController.text,
+        ),
+      );
+      {{else if flags.isProvider}}
+      await context.read<AuthProvider>().login(
+        context: context, 
+        email: emailController.text, 
+        password: passwordController.text,
+      );
+      {{else if flags.isGetX}}
+      await Get.find<AuthController>().login(
+        context: context, 
+        email: emailController.text, 
+        password: passwordController.text,
+      );
+      {{else}}
+      {{#if flags.usesFlutterHooks}}
+      isLoadingState.value = true;
+      {{/if}}
+      try {
+        final result = await AuthService.instance.login(
+          email: emailController.text.trim(), 
+          password: passwordController.text.trim(),
+        );
+
+        result.fold(
+          (failure) {
+            showToast(context, message: failure.message, status: 'error');
+          },
+          (user) {
+            if (context.mounted) {
+              {{#if (eq flags.routerPackage "go_router")}}
+              context.go(AppRoutes.home);
+              {{else if (eq flags.routerPackage "auto_route")}}
+              context.replaceRoute(const HomeRoute());
+              {{else}}
+              Navigator.pushReplacementNamed(context, AppRoutes.home);
+              {{/if}}
+            }
+          },
+        );
+      } catch (e) {
+       AppLogger.error(e.toString());
+      } finally {
+        {{#if flags.usesFlutterHooks}}
+        isLoadingState.value = false;
         {{/if}}
-
-        try {
-          // Trigger logic based on chosen state management option
-          {{#if flags.isRiverpod}}
-          await ref.read(authControllerProvider.notifier).login(context: context, email: emailController.text, password: passwordController.text);
-          {{else if flags.isBloc}}
-          context.read<AuthBloc>().add(LoginRequested(context: context, email: emailController.text, password: passwordController.text));
-          {{else if flags.isProvider}}
-          await context.read<AuthProvider>().login(context: context, email: emailController.text, password: passwordController.text);
-          {{else if flags.isGetX}}
-          await Get.find<AuthController>().login(context: context, email: emailController.text, password: passwordController.text);
-          {{else if flags.isMobX}}
-          await context.read<AuthStore>().login(context: context, email: emailController.text, password: passwordController.text);
-          {{else}}
-          await Future.delayed(const Duration(seconds: 2));
-          if (context.mounted) {
-            {{#if (eq flags.routerPackage "go_router")}}
-            context.go(AppRoutes.home);
-            {{else if (eq flags.routerPackage "auto_route")}}
-            context.replaceRoute(const HomeRoute());
-            {{else}}
-            Navigator.pushReplacementNamed(context, AppRoutes.home);
-            {{/if}}
-          }
-          {{/if}}
-        } catch (e) {
-          {{#if flags.isRiverpod}}
-          {{else if flags.isBloc}}
-          {{else if flags.isProvider}}
-          {{else if flags.isGetX}}
-          {{else}}
-          errorMessageState.value = e.toString();
-          {{/if}}
-        } finally {
-          if (context.mounted) {
-            {{#if flags.isRiverpod}}
-            {{else if flags.isBloc}}
-            {{else if flags.isProvider}}
-            {{else if flags.isGetX}}
-            {{else}}
-            isLoadingState.value = false;
-            {{/if}}
-          }
-        }
       }
-    }
-
-    void onSignUp() {
-      // Navigate to sign up
-      {{#if (eq flags.routerPackage "go_router")}}
-      context.push(AppRoutes.signup);
-      {{else if (eq flags.routerPackage "auto_route")}}
-      context.pushRoute(const SignupRoute());
-      {{else}}
-      Navigator.pushNamed(context, AppRoutes.signup);
       {{/if}}
     }
 
-    void onForgotPassword() {
-      // Navigate to forgot password
-      {{#if (eq flags.routerPackage "go_router")}}
-      context.push(AppRoutes.forgotPassword);
-      {{else if (eq flags.routerPackage "auto_route")}}
-      context.pushRoute(const ForgotPasswordRoute());
-      {{else}}
-      Navigator.pushNamed(context, AppRoutes.forgotPassword);
-      {{/if}}
-    }
-
-    return _LoginView(
-      formKey: formKey,
-      emailController: emailController,
-      passwordController: passwordController,
-      obscurePassword: obscurePassword.value,
-      rememberMe: rememberMe.value,
-      isLoading: isLoading,
-      errorMessage: errorMessage,
-      onToggleObscurePassword: () => obscurePassword.value = !obscurePassword.value,
-      onToggleRememberMe: (val) => rememberMe.value = val ?? false,
-      onLogin: onLogin,
-      onSignUp: onSignUp,
-      onForgotPassword: onForgotPassword,
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: {{res 'AppSpacing.lg' 'w' flags.usesScreenutil}}),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  height: 80, width: 80,
+                  decoration: BoxDecoration(color: cs.primary.withValues(alpha: 0.1), borderRadius: AppBorders.lg),
+                  child: Icon(Icons.person, size: 40, color: cs.primary),
+                ).animate().scale(duration: 600.milliseconds),
+                
+                SizedBox(height: {{res 'AppSpacing.xl' 'h' flags.usesScreenutil}}),
+                
+                Text(
+                  {{#if flags.supportsLocalization}}'auth.log_in'.tr(){{else}}'Welcome Back'{{/if}},
+                  style: tt.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+                ).animate().fadeIn().slideY(begin: 0.2),
+                
+                SizedBox(height: {{res 'AppSpacing.xxl' 'h' flags.usesScreenutil}}),
+                
+                // Form Card
+                Container(
+                  padding: EdgeInsets.all({{res 'AppSpacing.lg' 'w' flags.usesScreenutil}}),
+                  decoration: BoxDecoration(
+                    color: cs.surface,
+                    borderRadius: AppBorders.card,
+                    boxShadow: AppShadows.card,
+                    border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
+                  ),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        AppTextField(
+                          controller: emailController,
+                          enabled: !isLoading,
+                          label: 'Email',
+                          prefixIcon: const Icon({{#if flags.usesIconsaxPlus}}IconsaxPlusLinear.sms{{else}}Icons.email_outlined{{/if}}),
+                        ),
+                        SizedBox(height: {{res 'AppSpacing.md' 'h' flags.usesScreenutil}}),
+                        AppTextField(
+                          controller: passwordController,
+                          enabled: !isLoading,
+                          label: 'Password',
+                          obscureText: {{#if flags.usesFlutterHooks}}obscurePassword.value{{else}}obscurePassword{{/if}},
+                          prefixIcon: const Icon({{#if flags.usesIconsaxPlus}}IconsaxPlusLinear.lock{{else}}Icons.lock_outline{{/if}}),
+                          suffixIcon: IconButton(
+                            icon: Icon({{#if flags.usesFlutterHooks}}obscurePassword.value ? Icons.visibility_off : Icons.visibility{{else}}Icons.visibility{{/if}}),
+                            onPressed: () => {{#if flags.usesFlutterHooks}}obscurePassword.value = !obscurePassword.value{{else}}null{{/if}},
+                          ),
+                        ),
+                        {{#if (or flags.isBloc flags.isProvider flags.isGetX)}}
+                        if (errorMessage != null) ...[
+                          SizedBox(height: {{res 'AppSpacing.sm' 'h' flags.usesScreenutil}}),
+                          Text(errorMessage, style: tt.bodySmall?.copyWith(color: cs.error), textAlign: TextAlign.center),
+                        ],
+                        {{/if}}
+                        SizedBox(height: {{res 'AppSpacing.lg' 'h' flags.usesScreenutil}}),
+                        AppButton(
+                          label: 'Sign In',
+                          isLoading: isLoading,
+                          onPressed: isLoading ? null : handleLogin,
+                        ),
+                      ],
+                    ),
+                  ),
+                ).animate().fadeIn(delay: 400.milliseconds).slideY(begin: 0.1),
+                
+                SizedBox(height: {{res 'AppSpacing.xl' 'h' flags.usesScreenutil}}),
+                
+                Column(
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        {{#if (eq flags.routerPackage "go_router")}}
+                        context.push(AppRoutes.forgotPassword);
+                        {{else if (eq flags.routerPackage "auto_route")}}
+                        context.pushRoute(const ForgotPasswordRoute());
+                        {{else}}
+                        Navigator.pushNamed(context, AppRoutes.forgotPassword);
+                        {{/if}}
+                      }, 
+                      child: Text(
+                        {{#if flags.supportsLocalization}}'auth.forgot_password'.tr(){{else}}'Forgot Password?'{{/if}},
+                        style: tt.labelLarge?.copyWith(color: cs.primary, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    SizedBox(height: {{res 'AppSpacing.lg' 'h' flags.usesScreenutil}}),
+                    InkWell(
+                      onTap: () {
+                        {{#if (eq flags.routerPackage "go_router")}}
+                        context.push(AppRoutes.signup);
+                        {{else if (eq flags.routerPackage "auto_route")}}
+                        context.pushRoute(const SignupRoute());
+                        {{else}}
+                        Navigator.pushNamed(context, AppRoutes.signup);
+                        {{/if}}
+                      },
+                      child: RichText(
+                        text: TextSpan(
+                          text: {{#if flags.supportsLocalization}}'auth.dont_have_account'.tr(){{else}}'New here? '{{/if}},
+                          style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
+                          children: [
+                            TextSpan(
+                              text: {{#if flags.supportsLocalization}}'auth.sign_up_here'.tr(){{else}}'Create Account'{{/if}},
+                              style: TextStyle(color: cs.primary, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
-}
-{{else}}
-{{#if flags.isRiverpod}}
-class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
 
-  @override
-  ConsumerState<LoginScreen> createState() => _LoginScreenState();
-}
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+}
 {{else}}
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
-
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-{{/if}}
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late final TextEditingController _emailController;
-  late final TextEditingController _passwordController;
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  bool _rememberMe = false;
-{{#unless flags.isRiverpod}}
-{{#unless flags.isBloc}}
-{{#unless flags.isProvider}}
-{{#unless flags.isGetX}}
-{{#unless flags.isMobX}}
   bool _isLoading = false;
-  String? _errorMessage;
-{{/unless}}
-{{/unless}}
-{{/unless}}
-{{/unless}}
-{{/unless}}
+
+
 
   @override
-  void initState() {
-    super.initState();
-    _emailController = TextEditingController();
-    _passwordController = TextEditingController();
-  }
+  Widget build(BuildContext context) {
+    final cs = context.theme.colorScheme;
+    final tt = context.theme.textTheme;
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _onLogin() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      {{#if flags.isRiverpod}}
-      {{else if flags.isBloc}}
-      {{else if flags.isProvider}}
-      {{else if flags.isGetX}}
-      {{else}}
-      setState(() {
-        _isLoading = true;
-        _errorMessage = null;
-      });
-      {{/if}}
-
+    Future<void> handleLogin() async {
+      if (!(_formKey.currentState?.validate() ?? false)) return;
+      setState(() { _isLoading = true; });
       try {
-        // Trigger logic based on chosen state management option
-        {{#if flags.isRiverpod}}
-        await ref.read(authControllerProvider.notifier).login(context: context, email: _emailController.text, password: _passwordController.text);
-        {{else if flags.isBloc}}
-        context.read<AuthBloc>().add(LoginRequested(context: context, email: _emailController.text, password: _passwordController.text));
-        {{else if flags.isProvider}}
-        await context.read<AuthProvider>().login(context: context, email: _emailController.text, password: _passwordController.text);
-        {{else if flags.isGetX}}
-        await Get.find<AuthController>().login(context: context, email: _emailController.text, password: _passwordController.text);
-        {{else if flags.isMobX}}
-        await context.read<AuthStore>().login(context: context, email: _emailController.text, password: _passwordController.text);
-        {{else}}
-        await Future.delayed(const Duration(seconds: 2));
-        if (mounted) {
-          {{#if (eq flags.routerPackage "go_router")}}
-          context.go(AppRoutes.home);
-          {{else if (eq flags.routerPackage "auto_route")}}
-          context.replaceRoute(const HomeRoute());
-          {{else}}
-          Navigator.pushReplacementNamed(context, AppRoutes.home);
-          {{/if}}
-        }
-        {{/if}}
+        final result = await AuthService.instance.login(
+          email: _emailController.text.trim(), 
+          password: _passwordController.text.trim(),
+        );
+
+        result.fold(
+          (failure) => showToast(context, message: failure.message, status: 'error'),
+          (user) {
+            if (mounted) {
+              {{#if (eq flags.routerPackage "go_router")}}
+              context.go(AppRoutes.home);
+              {{else if (eq flags.routerPackage "auto_route")}}
+              context.replaceRoute(const HomeRoute());
+              {{else}}
+              Navigator.pushReplacementNamed(context, AppRoutes.home);
+              {{/if}}
+            }
+          },
+        );
       } catch (e) {
-        {{#if flags.isRiverpod}}
-        {{else if flags.isBloc}}
-        {{else if flags.isProvider}}
-        {{else if flags.isGetX}}
-        {{else}}
-        if (mounted) {
-          setState(() => _errorMessage = e.toString());
-        }
-        {{/if}}
+        setState(() => _errorMessage = e.toString());
       } finally {
-        if (mounted) {
-          {{#if flags.isRiverpod}}
-          {{else if flags.isBloc}}
-          {{else if flags.isProvider}}
-          {{else if flags.isGetX}}
-          {{else}}
-          setState(() => _isLoading = false);
-          {{/if}}
-        }
+        if (mounted) setState(() => _isLoading = false);
       }
     }
-  }
 
-  void _onSignUp() {
-    // Navigate to sign up
-    {{#if (eq flags.routerPackage "go_router")}}
-    context.push(AppRoutes.signup);
-    {{else if (eq flags.routerPackage "auto_route")}}
-    context.pushRoute(const SignupRoute());
-    {{else}}
-    Navigator.pushNamed(context, AppRoutes.signup);
-    {{/if}}
-  }
-
-  void _onForgotPassword() {
-    // Navigate to forgot password
-    {{#if (eq flags.routerPackage "go_router")}}
-    context.push(AppRoutes.forgotPassword);
-    {{else if (eq flags.routerPackage "auto_route")}}
-    context.pushRoute(const ForgotPasswordRoute());
-    {{else}}
-    Navigator.pushNamed(context, AppRoutes.forgotPassword);
-    {{/if}}
-  }
-
-  @override
-  Widget build(BuildContext context) {
-{{#if flags.isRiverpod}}
-    final isLoading = ref.watch(authControllerProvider);
-    final String? errorMessage = null;
-{{else if flags.isBloc}}
-    final isLoading = context.select((AuthBloc bloc) => bloc.state.isLoading);
-    final errorMessage = context.select((AuthBloc bloc) => bloc.state.errorMessage);
-{{else if flags.isProvider}}
-    final isLoading = context.select((AuthProvider p) => p.isLoading);
-    final errorMessage = context.select((AuthProvider p) => p.errorMessage);
-{{else if flags.isGetX}}
-    final AuthController authController = Get.find<AuthController>();
-    final isLoading = authController.isLoading.value;
-    final errorMessage = authController.errorMessage.value;
-{{else}}
-    final isLoading = _isLoading;
-    final errorMessage = _errorMessage;
-{{/if}}
-
-    return _LoginView(
-      formKey: _formKey,
-      emailController: _emailController,
-      passwordController: _passwordController,
-      obscurePassword: _obscurePassword,
-      rememberMe: _rememberMe,
-      isLoading: isLoading,
-      errorMessage: errorMessage,
-      onToggleObscurePassword: () => setState(() => _obscurePassword = !_obscurePassword),
-      onToggleRememberMe: (val) => setState(() => _rememberMe = val ?? false),
-      onLogin: _onLogin,
-      onSignUp: _onSignUp,
-      onForgotPassword: _onForgotPassword,
-    );
-  }
-}
-{{/if}}
-
-class _LoginView extends StatelessWidget {
-  const _LoginView({
-    required this.formKey,
-    required this.emailController,
-    required this.passwordController,
-    required this.obscurePassword,
-    required this.rememberMe,
-    required this.isLoading,
-    required this.errorMessage,
-    required this.onToggleObscurePassword,
-    required this.onToggleRememberMe,
-    required this.onLogin,
-    required this.onSignUp,
-    required this.onForgotPassword,
-  });
-
-  final GlobalKey<FormState> formKey;
-  final TextEditingController emailController;
-  final TextEditingController passwordController;
-  final bool obscurePassword;
-  final bool rememberMe;
-  final bool isLoading;
-  final String? errorMessage;
-  final VoidCallback onToggleObscurePassword;
-  final ValueChanged<bool?> onToggleRememberMe;
-  final VoidCallback onLogin;
-  final VoidCallback onSignUp;
-  final VoidCallback onForgotPassword;
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.theme.colorScheme.surface,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: {{res 'AppSpacing.lg' 'w' flags.usesScreenutil}}),
-          child: Form(
-            key: formKey,
+        child: Center(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: {{res 'AppSpacing.lg' 'w' flags.usesScreenutil}}),
             child: Column(
-            children: [
-              SizedBox(height: {{res 'AppSpacing.xxl' 'h' flags.usesScreenutil}}),
-              // Title
-              Text(
-                {{#if flags.supportsLocalization}}'auth.log_in'.tr(){{else}}'Log in'{{/if}},
-                textAlign: TextAlign.center,
-                style: context.theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: context.theme.colorScheme.onSurface,
-                  fontSize: {{res 28 'sp' flags.usesScreenutil}},
-                ),
-              ),
-              SizedBox(height: {{res 'AppSpacing.sm' 'h' flags.usesScreenutil}}),
-              // Subtitle
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: {{res 'AppSpacing.lg' 'w' flags.usesScreenutil}}),
-                child: Text(
-                  {{#if flags.supportsLocalization}}'auth.log_in_subtitle'.tr(){{else}}'Enter your email and password to securely access\nyour account and manage your services.'{{/if}},
-                  textAlign: TextAlign.center,
-                  style: context.theme.textTheme.bodyMedium?.copyWith(
-                    color: context.theme.colorScheme.onSurfaceVariant,
-                    height: 1.5,
-                    fontSize: {{res 14 'sp' flags.usesScreenutil}},
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  height: 80, width: 80,
+                  decoration: BoxDecoration(color: cs.primary.withValues(alpha: 0.1), borderRadius: AppBorders.lg),
+                  child: Icon(Icons.person, size: 40, color: cs.primary),
+                ).animate().scale(duration: 600.milliseconds),
+                
+                SizedBox(height: {{res 'AppSpacing.xl' 'h' flags.usesScreenutil}}),
+                
+                Text('Welcome Back', style: tt.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
+                
+                SizedBox(height: {{res 'AppSpacing.xxl' 'h' flags.usesScreenutil}}),
+                
+                Container(
+                  padding: EdgeInsets.all({{res 'AppSpacing.lg' 'w' flags.usesScreenutil}}),
+                  decoration: BoxDecoration(
+                    color: cs.surface,
+                    borderRadius: AppBorders.card,
+                    boxShadow: AppShadows.card,
                   ),
-                ),
-              ),
-              SizedBox(height: {{res 40 'h' flags.usesScreenutil}}),
-              // Email Field
-              AppTextField(
-                controller: emailController,
-                enabled: !isLoading,
-                hint: {{#if flags.supportsLocalization}}'auth.email_address'.tr(){{else}}'Email address'{{/if}},
-                keyboardType: TextInputType.emailAddress,
-                prefixIcon: const Icon(
-                  {{#if flags.usesIconsaxPlus}}
-                  IconsaxPlusLinear.sms,
-                  {{else if flags.usesFlutterRemix}}
-                  FlutterRemix.mail_line,
-                  {{else if flags.usesHugeicons}}
-                  HugeIcons.strokeRoundedMail01,
-                  {{else}}
-                  Icons.email_outlined,
-                  {{/if}}
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return {{#if flags.supportsLocalization}}'auth.email_required'.tr(){{else}}'Email is required'{{/if}};
-                  }
-                  if (!value.isEmail) {
-                    return {{#if flags.supportsLocalization}}'auth.email_invalid'.tr(){{else}}'Enter a valid email'{{/if}};
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: {{res 'AppSpacing.md' 'h' flags.usesScreenutil}}),
-              // Password Field
-              AppTextField(
-                controller: passwordController,
-                enabled: !isLoading,
-                hint: {{#if flags.supportsLocalization}}'auth.password'.tr(){{else}}'Password'{{/if}},
-                obscureText: obscurePassword,
-                prefixIcon: const Icon(
-                  {{#if flags.usesIconsaxPlus}}
-                  IconsaxPlusLinear.lock,
-                  {{else if flags.usesFlutterRemix}}
-                  FlutterRemix.lock_line,
-                  {{else if flags.usesHugeicons}}
-                  HugeIcons.strokeRoundedLock01,
-                  {{else}}
-                  Icons.lock_outline,
-                  {{/if}}
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return {{#if flags.supportsLocalization}}'auth.password_required'.tr(){{else}}'Password is required'{{/if}};
-                  }
-                  if (value.length < 6) {
-                    return {{#if flags.supportsLocalization}}'auth.password_too_short'.tr(){{else}}'Password must be at least 6 characters'{{/if}};
-                  }
-                  return null;
-                },
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    {{#if flags.usesIconsaxPlus}}
-                    obscurePassword ? IconsaxPlusLinear.eye_slash : IconsaxPlusLinear.eye,
-                    {{else if flags.usesFlutterRemix}}
-                    obscurePassword ? FlutterRemix.eye_off_line : FlutterRemix.eye_line,
-                    {{else if flags.usesHugeicons}}
-                    obscurePassword ? HugeIcons.strokeRoundedViewOff : HugeIcons.strokeRoundedView,
-                    {{else}}
-                    obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                    {{/if}}
-                    color: context.theme.colorScheme.onSurfaceVariant,
-                  ),
-                  onPressed: onToggleObscurePassword,
-                ),
-              ),
-              SizedBox(height: {{res 'AppSpacing.sm' 'h' flags.usesScreenutil}}), 
-              // Remember Me & Forgot Password
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: rememberMe,
-                        onChanged: onToggleRememberMe,
-                        activeColor: context.theme.colorScheme.primary,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                      ),
-                      Text(
-                        {{#if flags.supportsLocalization}}'auth.remember_me'.tr(){{else}}'Remember me'{{/if}},
-                        style: context.theme.textTheme.bodySmall?.copyWith(
-                          color: context.theme.colorScheme.onSurface,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                  TextButton(
-                    onPressed: onForgotPassword,
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      minimumSize: const Size(0, 0),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: Text(
-                      {{#if flags.supportsLocalization}}'auth.forgot_password'.tr(){{else}}'Forgot Password'{{/if}},
-                      style: context.theme.textTheme.bodySmall?.copyWith(
-                        color: context.theme.colorScheme.secondary.withValues(
-                            alpha: 0.6,
-                          ),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: {{res 32 'h' flags.usesScreenutil}}),
-              // Error Message
-              if (errorMessage != null)
-                Padding(
-                  padding: EdgeInsets.only(bottom: {{res 'AppSpacing.md' 'h' flags.usesScreenutil}}),
-                  child: Text(
-                    errorMessage!,
-                    style: context.theme.textTheme.bodyMedium?.copyWith(color: context.theme.colorScheme.error),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-
-              // Login Button
-              AppButton(
-                label: {{#if flags.supportsLocalization}}'auth.login_button'.tr(){{else}}'Login'{{/if}},
-                onPressed: isLoading ? null : onLogin,
-                isLoading: isLoading,
-                variant: ButtonVariant.primary,
-                height: ButtonSize.large,
-                width: ButtonSize.large,
-                isFullWidth: true,
-              ),
-              SizedBox(height: {{res 'AppSpacing.xl' 'h' flags.usesScreenutil}}),
-              // Sign Up Link
-              Center(
-                child: InkWell(
-                  onTap: onSignUp,
-                  child: RichText(
-                    text: TextSpan(
-                      text: {{#if flags.supportsLocalization}}'auth.dont_have_account'.tr(){{else}}'Don\'t have an account? '{{/if}},
-                      style: context.theme.textTheme.bodyMedium?.copyWith(
-                        color: context.theme.colorScheme.secondary.withValues(
-                            alpha: 0.6,
-                          ),
-                        fontWeight: FontWeight.w500,
-                      ),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        TextSpan(
-                          text: {{#if flags.supportsLocalization}}'auth.sign_up_here'.tr(){{else}}'Sign Up here'{{/if}},
-                          style: context.theme.textTheme.bodyMedium?.copyWith(
-                            color: context.theme.colorScheme.primary,
-                            fontWeight: FontWeight.w700,
+                        AppTextField(controller: _emailController, label: 'Email', enabled: !_isLoading),
+                        SizedBox(height: {{res 'AppSpacing.md' 'h' flags.usesScreenutil}}),
+                        AppTextField(
+                          controller: _passwordController,
+                          label: 'Password',
+                          obscureText: _obscurePassword,
+                          enabled: !_isLoading,
+                          suffixIcon: IconButton(
+                            icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
+                            onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                           ),
                         ),
+                        SizedBox(height: {{res 'AppSpacing.lg' 'h' flags.usesScreenutil}}),
+                        AppButton(label: 'Sign In', isLoading: _isLoading, onPressed: _isLoading ? null : handleLogin),
                       ],
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: {{res 'AppSpacing.xl' 'h' flags.usesScreenutil}}),
-              // Divider text
-              Row(
-                children: [
-                  const Expanded(child: AppDivider()),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: {{res 'AppSpacing.md' 'w' flags.usesScreenutil}}),
-                    child: Text(
-                      {{#if flags.supportsLocalization}}'auth.or_continue_with'.tr(){{else}}'Or Continue With Account'{{/if}},
-                      style: textTheme.labelSmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w500,
+                
+                SizedBox(height: {{res 'AppSpacing.xl' 'h' flags.usesScreenutil}}),
+                
+                Column(
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        {{#if (eq flags.routerPackage "go_router")}}
+                        context.push(AppRoutes.forgotPassword);
+                        {{else if (eq flags.routerPackage "auto_route")}}
+                        context.pushRoute(const ForgotPasswordRoute());
+                        {{else}}
+                        Navigator.pushNamed(context, AppRoutes.forgotPassword);
+                        {{/if}}
+                      }, 
+                      child: Text('Forgot Password?', style: tt.labelLarge?.copyWith(color: cs.primary, fontWeight: FontWeight.bold)),
+                    ),
+                    SizedBox(height: {{res 'AppSpacing.lg' 'h' flags.usesScreenutil}}),
+                    InkWell(
+                      onTap: () {
+                        {{#if (eq flags.routerPackage "go_router")}}
+                        context.push(AppRoutes.signup);
+                        {{else if (eq flags.routerPackage "auto_route")}}
+                        context.pushRoute(const SignupRoute());
+                        {{else}}
+                        Navigator.pushNamed(context, AppRoutes.signup);
+                        {{/if}}
+                      },
+                      child: RichText(
+                        text: TextSpan(
+                          text: 'New here? ',
+                          style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
+                          children: [TextSpan(text: 'Create Account', style: TextStyle(color: cs.primary, fontWeight: FontWeight.bold))],
+                        ),
                       ),
                     ),
-                  ),
-                  const Expanded(child: AppDivider()),
-                ],
-              ),
-              SizedBox(height: {{res 'AppSpacing.xl' 'h' flags.usesScreenutil}}),
-              
-              // Social Buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _SocialButton(
-                    onTap: () {},
-                    iconData: Icons.facebook,
-                    iconColor: const Color(0xFF1877F2),
-                  ),
-                  SizedBox(width: {{res 'AppSpacing.md' 'w' flags.usesScreenutil}}),
-                  // Emulate Google G icon using text for generic material 
-                  _SocialButton(
-                    onTap: () {},
-                    child: Text(
-                      'G',
-                      style: TextStyle(
-                        fontSize: {{res 22 'sp' flags.usesScreenutil}},
-                        fontWeight: FontWeight.w900,
-                        color: Colors.red, // normally multicolored, simplified here
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: {{res 'AppSpacing.md' 'w' flags.usesScreenutil}}),
-                  _SocialButton(
-                    onTap: () {},
-                    iconData: Icons.apple,
-                    iconColor: colorScheme.onSurface,
-                  ),
-                ],
-              ),
-              SizedBox(height: {{res 'AppSpacing.xxl' 'h' flags.usesScreenutil}}),
-            ],
-          ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 }
-
-class _SocialButton extends StatelessWidget {
-  final VoidCallback onTap;
-  final IconData? iconData;
-  final Color? iconColor;
-  final Widget? child;
-
-  const _SocialButton({
-    required this.onTap,
-    this.iconData,
-    this.iconColor,
-    this.child,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(50),
-      child: Container(
-        height: {{res 48 'h' flags.usesScreenutil}},
-        width: {{res 48 'w' flags.usesScreenutil}},
-        decoration: BoxDecoration(
-          color: context.theme.colorScheme.surface,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        alignment: Alignment.center,
-        child: child ??
-            Icon(
-              iconData,
-              size: {{res 24 'sp' flags.usesScreenutil}},
-              color: iconColor,
-            ),
-      ),
-    );
-  }
-}
+{{/if}}
