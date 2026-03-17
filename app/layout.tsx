@@ -1,6 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Sora } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
 
 const sora = Sora({
@@ -25,8 +26,8 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
-  keywords: ["Flutter", "Scaffolding", "Boilerplate", "Clean Architecture", "MVVM", "Project Generator", "Dart", "Development Tools"],
-  authors: [{ name: "Arjun544", url: "https://github.com/Arjun544" }],
+  keywords: ["Flutter Init", "Flutter Project Generator", "FlutterInit", "Flutter", "Scaffolding", "Boilerplate", "Clean Architecture", "MVVM", "Project Generator", "Dart", "Development Tools"],
+  authors: [{ name: "Arjun Mahar", url: "https://github.com/Arjun544" }],
   openGraph: {
     title: "Flutter Init",
     description: "Scaffolds your entire Flutter app with your preferred state management, routing, and utilities.",
@@ -98,6 +99,7 @@ export default function RootLayout({
         />
         {children}
         <Toaster />
+        <Analytics />
       </body>
     </html>
   );
