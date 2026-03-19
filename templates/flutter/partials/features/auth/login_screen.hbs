@@ -11,7 +11,7 @@ import 'package:{{flags.appSnake}}/src/{{#if (eq architecture "layer-first")}}pr
 {{else if flags.isProvider}}
 import 'package:{{flags.appSnake}}/src/{{#if (eq architecture "layer-first")}}presentation/providers/{{else if (eq architecture "mvc")}}controllers/auth/{{else if (eq architecture "mvvm")}}ui/auth/providers/{{else}}features/auth/presentation/providers/{{/if}}auth_provider.dart';
 {{else if flags.isGetX}}
-import 'package:{{flags.appSnake}}/src/{{#if (eq architecture "layer-first")}}presentation/providers/{{else if (eq architecture "mvc")}}controllers/auth/{{else if (eq architecture "mvvm")}}ui/auth/controllers/{{else}}features/auth/presentation/providers/{{/if}}auth_controller.dart';
+import 'package:{{flags.appSnake}}/src/{{#if (eq architecture "layer-first")}}presentation/controllers/auth/{{else if (eq architecture "mvc")}}controllers/auth/{{else if (eq architecture "mvvm")}}ui/auth/controllers/{{else}}features/auth/presentation/controllers/{{/if}}auth_controller.dart';
 {{else if flags.isMobX}}
 import 'package:{{flags.appSnake}}/src/{{#if (eq architecture "layer-first")}}presentation/providers/{{else if (eq architecture "mvc")}}controllers/auth/{{else if (eq architecture "mvvm")}}ui/auth/stores/{{else}}features/auth/presentation/providers/{{/if}}auth_store.dart';
 {{else}}
@@ -22,7 +22,7 @@ import 'package:{{flags.appSnake}}/src/{{#if (eq architecture "layer-first")}}pr
 @RoutePage()
 {{/if}}
 {{#if (or flags.isRiverpod flags.isBloc flags.isProvider flags.isGetX flags.isMobX flags.usesFlutterHooks)}}
-class LoginScreen extends {{#if (and flags.isRiverpod flags.usesFlutterHooks)}}HookConsumerWidget{{else if flags.isRiverpod}}ConsumerWidget{{else if flags.usesFlutterHooks}}HookWidget{{else}}StatelessWidget{{/if}} {
+class LoginScreen extends {{#if (and flags.isRiverpod flags.usesFlutterHooks)}}HookConsumerWidget{{else if flags.isRiverpod}}ConsumerWidget{{else if flags.isGetX}}GetView<AuthController>{{else if flags.usesFlutterHooks}}HookWidget{{else}}StatelessWidget{{/if}} {
   const LoginScreen({super.key});
 
   @override
@@ -44,38 +44,29 @@ class LoginScreen extends {{#if (and flags.isRiverpod flags.usesFlutterHooks)}}H
     final isLoading = ref.watch(authControllerProvider);
     {{else if flags.isBloc}}
     final isLoading = context.select((AuthBloc bloc) => bloc.state.isLoading);
-    final errorMessage = context.select((AuthBloc bloc) => bloc.state.errorMessage);
     {{else if flags.isProvider}}
     final isLoading = context.select((AuthProvider p) => p.isLoading);
-    final errorMessage = context.select((AuthProvider p) => p.errorMessage);
     {{else if flags.isGetX}}
-    final controller = Get.find<AuthController>();
-    final isLoading = controller.isLoading.value;
-    final errorMessage = controller.errorMessage.value;
     {{else if flags.isMobX}}
     // In a real app, MobX stores might be provided via Provider/GetIt.
     // Here we use a locally created memoized instance for the template.
     final authStore = {{#if flags.usesFlutterHooks}}useMemoized{{else}}null; // Add your MobX store here{{/if}}(() => AuthStore(repository: AuthRepositoryImpl()), []);
     final isLoading = authStore.isLoading;
-    final errorMessage = authStore.errorMessage;
     {{else if flags.isNoneState}}
     {{#if flags.usesFlutterHooks}}
     final viewModel = useMemoized(() => AuthViewModel(repository: AuthRepositoryImpl()), []);
     useListenable(viewModel);
     final isLoading = viewModel.isLoading;
-    final errorMessage = viewModel.errorMessage;
     {{else}}
     // Vanilla state without hooks would usually use a StatefulWidget or a simple ValueNotifier.
     // For the template, we show the loading state from a local variable.
     final isLoading = false;
-    final errorMessage = null;
     {{/if}}
     {{else if flags.usesFlutterHooks}}
     final isLoadingState = useState(false);
     final isLoading = isLoadingState.value;
     {{else}}
     final isLoading = false;
-    final errorMessage = null;
     {{/if}}
 
     final cs = context.theme.colorScheme;
@@ -107,7 +98,7 @@ class LoginScreen extends {{#if (and flags.isRiverpod flags.usesFlutterHooks)}}H
         password: passwordController.text,
       );
       {{else if flags.isGetX}}
-      await Get.find<AuthController>().login(
+       controller.login(
         context: context, 
         email: emailController.text, 
         password: passwordController.text,
@@ -160,7 +151,13 @@ class LoginScreen extends {{#if (and flags.isRiverpod flags.usesFlutterHooks)}}H
       {{/if}}
     }
 
+    {{#if flags.isGetX}}
+    return Obx(() {
+      final isLoading = controller.isLoading.value;
+      return Scaffold(
+    {{else}}
     return Scaffold(
+    {{/if}}
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -251,6 +248,8 @@ class LoginScreen extends {{#if (and flags.isRiverpod flags.usesFlutterHooks)}}H
                               context.push(AppRoutes.forgotPassword);
                               {{else if (eq flags.routerPackage "auto_route")}}
                               context.pushRoute(const ForgotPasswordRoute());
+                              {{else if flags.isGetX}}
+                              Get.toNamed(AppRoutes.forgotPassword);
                               {{else}}
                               Navigator.pushNamed(context, AppRoutes.forgotPassword);
                               {{/if}}
@@ -265,13 +264,6 @@ class LoginScreen extends {{#if (and flags.isRiverpod flags.usesFlutterHooks)}}H
                         ],
                       ),
                       SizedBox(height: {{res 'AppSpacing.lg' 'h' flags.usesScreenutil}}),
-                      {{#if (or flags.isBloc flags.isProvider flags.isGetX)}}
-                      if (errorMessage != null) ...[
-                        SizedBox(height: {{res 'AppSpacing.sm' 'h' flags.usesScreenutil}}),
-                        Text(errorMessage, style: tt.bodySmall?.copyWith(color: cs.error), textAlign: TextAlign.center),
-                        SizedBox(height: {{res 'AppSpacing.md' 'h' flags.usesScreenutil}}),
-                      ],
-                      {{/if}}
                       AppButton(
                         label: 'Sign In',
                         isLoading: isLoading,
@@ -347,6 +339,8 @@ class LoginScreen extends {{#if (and flags.isRiverpod flags.usesFlutterHooks)}}H
                     context.push(AppRoutes.signup);
                     {{else if (eq flags.routerPackage "auto_route")}}
                     context.pushRoute(const SignupRoute());
+                    {{else if flags.isGetX}}
+                    Get.toNamed(AppRoutes.signup);
                     {{else}}
                     Navigator.pushNamed(context, AppRoutes.signup);
                     {{/if}}
@@ -372,7 +366,12 @@ class LoginScreen extends {{#if (and flags.isRiverpod flags.usesFlutterHooks)}}H
           ),
         ),
       ),
+    {{#if flags.isGetX}}
     );
+    });
+    {{else}}
+    );
+    {{/if}}
   }
 }
 {{else}}
@@ -388,7 +387,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
-  String? _errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -421,7 +419,7 @@ class _LoginScreenState extends State<LoginScreen> {
           },
         );
       } catch (e) {
-        setState(() => _errorMessage = e.toString());
+        showToast(context, message: e.toString(), status: 'error');
       } finally {
         if (mounted) {
           setState(() => _isLoading = false);
@@ -520,6 +518,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               context.push(AppRoutes.forgotPassword);
                               {{else if (eq flags.routerPackage "auto_route")}}
                               context.pushRoute(const ForgotPasswordRoute());
+                              {{else if flags.isGetX}}
+                              Get.toNamed(AppRoutes.forgotPassword);
                               {{else}}
                               Navigator.pushNamed(context, AppRoutes.forgotPassword);
                               {{/if}}
@@ -609,6 +609,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     context.push(AppRoutes.signup);
                     {{else if (eq flags.routerPackage "auto_route")}}
                     context.pushRoute(const SignupRoute());
+                    {{else if flags.isGetX}}
+                    Get.toNamed(AppRoutes.signup);
                     {{else}}
                     Navigator.pushNamed(context, AppRoutes.signup);
                     {{/if}}
@@ -635,6 +637,5 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
-  }
 }
 {{/if}}

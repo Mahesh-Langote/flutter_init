@@ -30,6 +30,12 @@ export function StateStep() {
                             }
                         }
 
+                        if (stateManagement === "getx") {
+                            updates.navigation = "getx"
+                        } else if (config.navigation === "getx") {
+                            updates.navigation = "go_router"
+                        }
+
                         updateConfig(updates)
                     }}
                     className="grid gap-3"

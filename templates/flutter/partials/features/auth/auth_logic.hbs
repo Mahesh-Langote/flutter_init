@@ -79,7 +79,18 @@ class AuthController extends StateNotifier<bool> {
     state = false;
     result.fold(
       (failure) => showToast(context, message: failure.message, status: 'error'),
-      (success) => showToast(context, message: 'Password reset link sent successfully', status: 'success'),
+      (success) {
+        showToast(context, message: 'Password reset link sent successfully', status: 'success');
+        if (context.mounted) {
+          {{#if (eq flags.routerPackage "go_router")}}
+          context.go(AppRoutes.login);
+          {{else if (eq flags.routerPackage "auto_route")}}
+          context.replaceRoute(const LoginRoute());
+          {{else}}
+          Navigator.pushReplacementNamed(context, AppRoutes.login);
+          {{/if}}
+        }
+      },
     );
   }
 }
@@ -95,6 +106,7 @@ import 'package:auto_route/auto_route.dart';
 {{/if}}
 import 'package:{{flags.appSnake}}/src/routing/app_routes.dart';
 import 'package:{{flags.appSnake}}/src/utils/utils.dart';
+import 'package:{{flags.appSnake}}/src/imports/imports.dart';
 import 'package:{{flags.appSnake}}/src/{{#if (eq architecture "layer-first")}}domain/repositories/{{else if (eq architecture "mvc")}}services/{{else if (eq architecture "mvvm")}}data/repositories/{{else}}features/auth/domain/repositories/{{/if}}auth_repository.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
@@ -110,13 +122,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     LoginRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(state.copyWith(isLoading: true, errorMessage: null));
+    emit(state.copyWith(isLoading: true));
     
     final result = await _repository.login(email: event.email, password: event.password);
     
     result.fold(
       (failure) {
-        emit(state.copyWith(isLoading: false, errorMessage: failure.message));
+        emit(state.copyWith(isLoading: false));
+        showToast(event.context, message: failure.message, status: 'error');
       },
       (user) {
         emit(state.copyWith(isLoading: false));
@@ -137,13 +150,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     SignUpRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(state.copyWith(isLoading: true, errorMessage: null));
+    emit(state.copyWith(isLoading: true));
     
     final result = await _repository.signUp(name: event.name, email: event.email, password: event.password);
     
     result.fold(
       (failure) {
-        emit(state.copyWith(isLoading: false, errorMessage: failure.message));
+        emit(state.copyWith(isLoading: false));
+        showToast(event.context, message: failure.message, status: 'error');
       },
       (user) {
         emit(state.copyWith(isLoading: false));
@@ -164,16 +178,27 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     ForgotPasswordRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(state.copyWith(isLoading: true, errorMessage: null));
+    emit(state.copyWith(isLoading: true));
     
     final result = await _repository.forgotPassword(email: event.email);
     
     result.fold(
       (failure) {
-        emit(state.copyWith(isLoading: false, errorMessage: failure.message));
+        emit(state.copyWith(isLoading: false));
+        showToast(event.context, message: failure.message, status: 'error');
       },
       (success) {
         emit(state.copyWith(isLoading: false));
+        showToast(event.context, message: 'Password reset link sent successfully', status: 'success');
+        if (event.context.mounted) {
+          {{#if (eq flags.routerPackage "go_router")}}
+          event.context.go(AppRoutes.login);
+          {{else if (eq flags.routerPackage "auto_route")}}
+          event.context.replaceRoute(const LoginRoute());
+          {{else}}
+          Navigator.pushReplacementNamed(event.context, AppRoutes.login);
+          {{/if}}
+        }
       },
     );
   }
@@ -201,20 +226,20 @@ class SignUpRequested extends AuthEvent {
 }
 
 class ForgotPasswordRequested extends AuthEvent {
+  final BuildContext context;
   final String email;
-  const ForgotPasswordRequested({required this.email});
+  const ForgotPasswordRequested({required this.context, required this.email});
 }
 
 class AuthState extends Equatable {
   final bool isLoading;
-  final String? errorMessage;
-  const AuthState({required this.isLoading, this.errorMessage});
-  const AuthState.initial() : isLoading = false, errorMessage = null;
-  AuthState copyWith({bool? isLoading, String? errorMessage}) {
-    return AuthState(isLoading: isLoading ?? this.isLoading, errorMessage: errorMessage);
+  const AuthState({required this.isLoading});
+  const AuthState.initial() : isLoading = false;
+  AuthState copyWith({bool? isLoading}) {
+    return AuthState(isLoading: isLoading ?? this.isLoading);
   }
   @override
-  List<Object?> get props => [isLoading, errorMessage];
+  List<Object?> get props => [isLoading];
 }
 {{else if flags.isNoneState}}
 import 'package:flutter/material.dart';
@@ -226,6 +251,7 @@ import 'package:go_router/go_router.dart';
 import 'package:auto_route/auto_route.dart';
 {{/if}}
 import 'package:{{flags.appSnake}}/src/utils/utils.dart';
+import 'package:{{flags.appSnake}}/src/imports/imports.dart';
 import 'package:{{flags.appSnake}}/src/{{#if (eq architecture "layer-first")}}domain/repositories/{{else if (eq architecture "mvc")}}services/{{else if (eq architecture "mvvm")}}data/repositories/{{else}}features/auth/domain/repositories/{{/if}}auth_repository.dart';
 
 class AuthViewModel extends ChangeNotifier {
@@ -234,35 +260,25 @@ class AuthViewModel extends ChangeNotifier {
   AuthViewModel({required AuthRepository repository}) : _repository = repository;
 
   bool _isLoading = false;
-  String? _errorMessage;
 
   bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
 
   void _setLoading(bool value) {
     _isLoading = value;
     notifyListeners();
   }
 
-  void _setError(String? message) {
-    _errorMessage = message;
-    notifyListeners();
-  }
-
-  Future<bool> login({required BuildContext context, required String email, required String password}) async {
+  void login({required BuildContext context, required String email, required String password}) async {
     _setLoading(true);
-    _setError(null);
     
     final result = await _repository.login(email: email, password: password);
     
-    return result.fold(
+    _setLoading(false);
+    result.fold(
       (failure) {
-        _setError(failure.message);
-        _setLoading(false);
-        return false;
+        showToast(context, message: failure.message, status: 'error');
       },
       (user) {
-        _setLoading(false);
         if (context.mounted) {
           {{#if (eq flags.routerPackage "go_router")}}
           context.go(AppRoutes.home);
@@ -272,25 +288,21 @@ class AuthViewModel extends ChangeNotifier {
           Navigator.pushReplacementNamed(context, AppRoutes.home);
           {{/if}}
         }
-        return true;
       },
     );
   }
 
-  Future<bool> signUp({required BuildContext context, required String name, required String email, required String password}) async {
+  void signUp({required BuildContext context, required String name, required String email, required String password}) async {
     _setLoading(true);
-    _setError(null);
     
     final result = await _repository.signUp(name: name, email: email, password: password);
     
-    return result.fold(
+    _setLoading(false);
+    result.fold(
       (failure) {
-        _setError(failure.message);
-        _setLoading(false);
-        return false;
+        showToast(context, message: failure.message, status: 'error');
       },
       (user) {
-        _setLoading(false);
         if (context.mounted) {
           {{#if (eq flags.routerPackage "go_router")}}
           context.go(AppRoutes.home);
@@ -300,26 +312,22 @@ class AuthViewModel extends ChangeNotifier {
           Navigator.pushReplacementNamed(context, AppRoutes.home);
           {{/if}}
         }
-        return true;
       },
     );
   }
 
-  Future<bool> forgotPassword({required BuildContext context, required String email}) async {
+  void forgotPassword({required BuildContext context, required String email}) async {
     _setLoading(true);
-    _setError(null);
     
     final result = await _repository.forgotPassword(email: email);
     
-    return result.fold(
+    _setLoading(false);
+    result.fold(
       (failure) {
-        _setError(failure.message);
-        _setLoading(false);
-        return false;
+        showToast(context, message: failure.message, status: 'error');
       },
       (success) {
-        _setLoading(false);
-        return true;
+        showToast(context, message: 'Password reset link sent successfully', status: 'success');
       },
     );
   }
@@ -334,6 +342,7 @@ import 'package:go_router/go_router.dart';
 import 'package:auto_route/auto_route.dart';
 {{/if}}
 import 'package:{{flags.appSnake}}/src/utils/utils.dart';
+import 'package:{{flags.appSnake}}/src/imports/imports.dart';
 import 'package:{{flags.appSnake}}/src/{{#if (eq architecture "layer-first")}}domain/repositories/{{else if (eq architecture "mvc")}}services/{{else if (eq architecture "mvvm")}}data/repositories/{{else}}features/auth/domain/repositories/{{/if}}auth_repository.dart';
 
 class AuthProvider extends ChangeNotifier {
@@ -342,35 +351,25 @@ class AuthProvider extends ChangeNotifier {
   AuthProvider({required AuthRepository repository}) : _repository = repository;
 
   bool _isLoading = false;
-  String? _errorMessage;
 
   bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
 
   void _setLoading(bool value) {
     _isLoading = value;
     notifyListeners();
   }
 
-  void _setError(String? message) {
-    _errorMessage = message;
-    notifyListeners();
-  }
-
-  Future<bool> login({required BuildContext context, required String email, required String password}) async {
+  void login({required BuildContext context, required String email, required String password}) async {
     _setLoading(true);
-    _setError(null);
     
     final result = await _repository.login(email: email, password: password);
     
-    return result.fold(
+    _setLoading(false);
+    result.fold(
       (failure) {
-        _setError(failure.message);
-        _setLoading(false);
-        return false;
+        showToast(context, message: failure.message, status: 'error');
       },
       (user) {
-        _setLoading(false);
         if (context.mounted) {
           {{#if (eq flags.routerPackage "go_router")}}
           context.go(AppRoutes.home);
@@ -380,25 +379,21 @@ class AuthProvider extends ChangeNotifier {
           Navigator.pushReplacementNamed(context, AppRoutes.home);
           {{/if}}
         }
-        return true;
       },
     );
   }
 
-  Future<bool> signUp({required BuildContext context, required String name, required String email, required String password}) async {
+  void signUp({required BuildContext context, required String name, required String email, required String password}) async {
     _setLoading(true);
-    _setError(null);
     
     final result = await _repository.signUp(name: name, email: email, password: password);
     
-    return result.fold(
+    _setLoading(false);
+    result.fold(
       (failure) {
-        _setError(failure.message);
-        _setLoading(false);
-        return false;
+        showToast(context, message: failure.message, status: 'error');
       },
       (user) {
-        _setLoading(false);
         if (context.mounted) {
           {{#if (eq flags.routerPackage "go_router")}}
           context.go(AppRoutes.home);
@@ -408,26 +403,31 @@ class AuthProvider extends ChangeNotifier {
           Navigator.pushReplacementNamed(context, AppRoutes.home);
           {{/if}}
         }
-        return true;
       },
     );
   }
 
-  Future<bool> forgotPassword({required BuildContext context, required String email}) async {
+  void forgotPassword({required BuildContext context, required String email}) async {
     _setLoading(true);
-    _setError(null);
     
     final result = await _repository.forgotPassword(email: email);
     
-    return result.fold(
+    _setLoading(false);
+    result.fold(
       (failure) {
-        _setError(failure.message);
-        _setLoading(false);
-        return false;
+        showToast(context, message: failure.message, status: 'error');
       },
       (success) {
-        _setLoading(false);
-        return true;
+        showToast(context, message: 'Password reset link sent successfully', status: 'success');
+        if (context.mounted) {
+          {{#if (eq flags.routerPackage "go_router")}}
+          context.go(AppRoutes.login);
+          {{else if (eq flags.routerPackage "auto_route")}}
+          context.replaceRoute(const LoginRoute());
+          {{else}}
+          Navigator.pushReplacementNamed(context, AppRoutes.login);
+          {{/if}}
+        }
       },
     );
   }
@@ -443,6 +443,7 @@ import 'package:auto_route/auto_route.dart';
 {{/if}}
 import 'package:{{flags.appSnake}}/src/routing/app_routes.dart';
 import 'package:{{flags.appSnake}}/src/utils/utils.dart';
+import 'package:{{flags.appSnake}}/src/imports/imports.dart';
 import 'package:{{flags.appSnake}}/src/{{#if (eq architecture "layer-first")}}domain/repositories/{{else if (eq architecture "mvc")}}services/{{else if (eq architecture "mvvm")}}data/repositories/{{else}}features/auth/domain/repositories/{{/if}}auth_repository.dart';
 
 class AuthController extends GetxController {
@@ -451,79 +452,52 @@ class AuthController extends GetxController {
   AuthController({required AuthRepository repository}) : _repository = repository;
 
   final isLoading = false.obs;
-  final errorMessage = RxnString();
 
-  Future<bool> login({required BuildContext context, required String email, required String password}) async {
+  void login({required BuildContext context, required String email, required String password}) async {
     isLoading.value = true;
-    errorMessage.value = null;
     
     final result = await _repository.login(email: email, password: password);
     
-    return result.fold(
+    isLoading.value = false;
+    result.fold(
       (failure) {
-        errorMessage.value = failure.message;
-        isLoading.value = false;
-        return false;
+        showToast(context, message: failure.message, status: 'error');
       },
       (user) {
-        isLoading.value = false;
-        if (context.mounted) {
-          {{#if (eq flags.routerPackage "go_router")}}
-          context.go(AppRoutes.home);
-          {{else if (eq flags.routerPackage "auto_route")}}
-          context.replaceRoute(const HomeRoute());
-          {{else}}
-          Navigator.pushReplacementNamed(context, AppRoutes.home);
-          {{/if}}
-        }
-        return true;
+        Get.offAllNamed(AppRoutes.home);
       },
     );
   }
 
-  Future<bool> signUp({required BuildContext context, required String name, required String email, required String password}) async {
+  void signUp({required BuildContext context, required String name, required String email, required String password}) async {
     isLoading.value = true;
-    errorMessage.value = null;
     
     final result = await _repository.signUp(name: name, email: email, password: password);
     
-    return result.fold(
+    isLoading.value = false;
+    result.fold(
       (failure) {
-        errorMessage.value = failure.message;
-        isLoading.value = false;
-        return false;
+        showToast(context, message: failure.message, status: 'error');
       },
       (user) {
-        isLoading.value = false;
-        if (context.mounted) {
-          {{#if (eq flags.routerPackage "go_router")}}
-          context.go(AppRoutes.home);
-          {{else if (eq flags.routerPackage "auto_route")}}
-          context.replaceRoute(const HomeRoute());
-          {{else}}
-          Navigator.pushReplacementNamed(context, AppRoutes.home);
-          {{/if}}
-        }
-        return true;
+        Get.offAllNamed(AppRoutes.home);
       },
     );
   }
 
-  Future<bool> forgotPassword({required BuildContext context, required String email}) async {
+  void forgotPassword({required BuildContext context, required String email}) async {
     isLoading.value = true;
-    errorMessage.value = null;
     
     final result = await _repository.forgotPassword(email: email);
     
-    return result.fold(
+    isLoading.value = false;
+    result.fold(
       (failure) {
-        errorMessage.value = failure.message;
-        isLoading.value = false;
-        return false;
+        showToast(context, message: failure.message, status: 'error');
       },
       (success) {
-        isLoading.value = false;
-        return true;
+        showToast(context, message: 'Password reset link sent successfully', status: 'success');
+        Get.offNamed(AppRoutes.login);
       },
     );
   }
@@ -539,6 +513,7 @@ import 'package:auto_route/auto_route.dart';
 {{/if}}
 import 'package:{{flags.appSnake}}/src/routing/app_routes.dart';
 import 'package:{{flags.appSnake}}/src/utils/utils.dart';
+import 'package:{{flags.appSnake}}/src/imports/imports.dart';
 import 'package:{{flags.appSnake}}/src/{{#if (eq architecture "layer-first")}}domain/repositories/{{else if (eq architecture "mvc")}}services/{{else if (eq architecture "mvvm")}}data/repositories/{{else}}features/auth/domain/repositories/{{/if}}auth_repository.dart';
 
 part 'auth_store.g.dart';
@@ -553,24 +528,18 @@ abstract class _AuthStore with Store {
   @observable
   bool isLoading = false;
 
-  @observable
-  String? errorMessage;
-
   @action
-  Future<bool> login({required BuildContext context, required String email, required String password}) async {
+  void login({required BuildContext context, required String email, required String password}) async {
     isLoading = true;
-    errorMessage = null;
 
     final result = await _repository.login(email: email, password: password);
 
-    return result.fold(
+    isLoading = false;
+    result.fold(
       (failure) {
-        errorMessage = failure.message;
-        isLoading = false;
-        return false;
+        showToast(context, message: failure.message, status: 'error');
       },
       (user) {
-        isLoading = false;
         if (context.mounted) {
           {{#if (eq flags.routerPackage "go_router")}}
           context.go(AppRoutes.home);
@@ -580,26 +549,22 @@ abstract class _AuthStore with Store {
           Navigator.pushReplacementNamed(context, AppRoutes.home);
           {{/if}}
         }
-        return true;
       },
     );
   }
 
   @action
-  Future<bool> signUp({required BuildContext context, required String name, required String email, required String password}) async {
+  void signUp({required BuildContext context, required String name, required String email, required String password}) async {
     isLoading = true;
-    errorMessage = null;
 
     final result = await _repository.signUp(name: name, email: email, password: password);
 
-    return result.fold(
+    isLoading = false;
+    result.fold(
       (failure) {
-        errorMessage = failure.message;
-        isLoading = false;
-        return false;
+        showToast(context, message: failure.message, status: 'error');
       },
       (user) {
-        isLoading = false;
         if (context.mounted) {
           {{#if (eq flags.routerPackage "go_router")}}
           context.go(AppRoutes.home);
@@ -609,27 +574,32 @@ abstract class _AuthStore with Store {
           Navigator.pushReplacementNamed(context, AppRoutes.home);
           {{/if}}
         }
-        return true;
       },
     );
   }
 
   @action
-  Future<bool> forgotPassword({required BuildContext context, required String email}) async {
+  void forgotPassword({required BuildContext context, required String email}) async {
     isLoading = true;
-    errorMessage = null;
 
     final result = await _repository.forgotPassword(email: email);
 
-    return result.fold(
+    isLoading = false;
+    result.fold(
       (failure) {
-        errorMessage = failure.message;
-        isLoading = false;
-        return false;
+        showToast(context, message: failure.message, status: 'error');
       },
       (success) {
-        isLoading = false;
-        return true;
+        showToast(context, message: 'Password reset link sent successfully', status: 'success');
+        if (context.mounted) {
+          {{#if (eq flags.routerPackage "go_router")}}
+          context.go(AppRoutes.login);
+          {{else if (eq flags.routerPackage "auto_route")}}
+          context.replaceRoute(const LoginRoute());
+          {{else}}
+          Navigator.pushReplacementNamed(context, AppRoutes.login);
+          {{/if}}
+        }
       },
     );
   }

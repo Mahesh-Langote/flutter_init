@@ -1,4 +1,8 @@
 import 'package:{{flags.appSnake}}/src/imports/imports.dart';
+{{#if flags.isGetX}}
+import 'package:get/get.dart';
+import 'package:{{flags.appSnake}}/src/routing/app_bindings.dart';
+{{/if}}
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -16,14 +20,20 @@ class App extends StatelessWidget {
 
   {{#if flags.isCupertino}}
   Widget _buildCupertinoApp(BuildContext context) {
-    return CupertinoApp{{#if flags.routerPackage}}.router{{/if}}(
+    return {{#if flags.isGetX}}GetCupertinoApp{{else}}CupertinoApp{{/if}}{{#if (and flags.routerPackage (not flags.isGetX))}}.router{{/if}}(
+      {{#if flags.isGetX}}
+      initialBinding: AppBindings(),
+      {{/if}}
       {{#unless flags.routerPackage}}
       navigatorKey: rootNavigatorKey,
       {{/unless}}
       title: '{{appName}}',
       debugShowCheckedModeBanner: false,
       theme: buildCupertinoTheme(primaryColorHex: '{{theme.primaryColor}}'),
-      {{#if flags.routerPackage}}
+      {{#if (eq flags.routerPackage "getx")}}
+      initialRoute: AppRoutes.onboarding,
+      getPages: AppRouter.getPages,
+      {{else if flags.routerPackage}}
       routerConfig: {{#if (eq flags.routerPackage "go_router")}}appRouter{{else}}AppRouter().config(){{/if}},
       {{else}}
       home: const OnboardingPage(),
@@ -57,7 +67,10 @@ class App extends StatelessWidget {
   }
   {{else}}
   Widget _buildMaterialApp(BuildContext context) {
-    return MaterialApp{{#if flags.routerPackage}}.router{{/if}}(
+    return {{#if flags.isGetX}}GetMaterialApp{{else}}MaterialApp{{/if}}{{#if (and flags.routerPackage (not (eq flags.routerPackage "getx")))}}.router{{/if}}(
+      {{#if flags.isGetX}}
+      initialBinding: AppBindings(),
+      {{/if}}
       {{#unless flags.routerPackage}}
       navigatorKey: rootNavigatorKey,
       {{/unless}}
@@ -68,7 +81,10 @@ class App extends StatelessWidget {
       darkTheme: buildDarkTheme(primaryColorHex: '{{theme.primaryColor}}'),
       themeMode: {{#if theme.darkMode.system}}ThemeMode.system{{else}}ThemeMode.dark{{/if}},
       {{/if}}
-      {{#if flags.routerPackage}}
+      {{#if (eq flags.routerPackage "getx")}}
+      initialRoute: AppRoutes.onboarding,
+      getPages: AppRouter.getPages,
+      {{else if flags.routerPackage}}
       routerConfig: {{#if (eq flags.routerPackage "go_router")}}appRouter{{else}}AppRouter().config(){{/if}},
       {{else}}
       home: const OnboardingPage(),

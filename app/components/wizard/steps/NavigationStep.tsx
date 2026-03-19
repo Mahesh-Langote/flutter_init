@@ -12,10 +12,10 @@ export function NavigationStep() {
 
     // Filter options based on state management selection
     const filteredOptions = navigationOptions.filter(option => {
-        if (option.value === "getx") {
-            return config.stateManagement === "getx"
+        if (config.stateManagement === "getx") {
+            return option.value === "getx"
         }
-        return true
+        return option.value !== "getx"
     })
 
     return (

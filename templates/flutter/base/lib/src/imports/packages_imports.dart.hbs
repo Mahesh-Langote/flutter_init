@@ -20,7 +20,12 @@ export 'package:provider/provider.dart' hide Dispose;
 export 'package:flutter_bloc/flutter_bloc.dart';
 {{/if}}
 {{#if flags.isGetX}}
-export 'package:get/get.dart';
+// For Navigation
+export 'package:get/get_navigation/get_navigation.dart' hide GetContextExtensions;
+// For State Management (.obs, GetxController, Obx)
+export 'package:get/get_state_manager/get_state_manager.dart';
+// For Dependency Management (Get.put, Get.find)
+export 'package:get/get_instance/get_instance.dart';
 {{/if}}
 {{#if flags.isMobX}}
 export 'package:mobx/mobx.dart';
