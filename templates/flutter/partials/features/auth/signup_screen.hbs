@@ -97,7 +97,7 @@ class SignupScreen extends {{#if (and flags.isRiverpod flags.usesFlutterHooks)}}
         ),
       );
       {{else if flags.isProvider}}
-      await context.read<AuthProvider>().signUp(
+      context.read<AuthProvider>().signUp(
         context: context, 
         name: nameController.text,
         email: emailController.text, 
@@ -111,14 +111,14 @@ class SignupScreen extends {{#if (and flags.isRiverpod flags.usesFlutterHooks)}}
         password: passwordController.text,
       );
       {{else if flags.isMobX}}
-      await authStore.signUp(
+      authStore.signUp(
         context: context, 
         name: nameController.text, 
         email: emailController.text.trim(), 
         password: passwordController.text.trim(),
       );
       {{else if (and flags.isNoneState flags.usesFlutterHooks)}}
-      await viewModel.signUp(
+      viewModel.signUp(
         context: context, 
         name: nameController.text, 
         email: emailController.text.trim(), 

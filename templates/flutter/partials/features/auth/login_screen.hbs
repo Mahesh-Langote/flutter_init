@@ -92,7 +92,7 @@ class LoginScreen extends {{#if (and flags.isRiverpod flags.usesFlutterHooks)}}H
         ),
       );
       {{else if flags.isProvider}}
-      await context.read<AuthProvider>().login(
+       context.read<AuthProvider>().login(
         context: context, 
         email: emailController.text, 
         password: passwordController.text,
@@ -104,13 +104,13 @@ class LoginScreen extends {{#if (and flags.isRiverpod flags.usesFlutterHooks)}}H
         password: passwordController.text,
       );
       {{else if flags.isMobX}}
-      await authStore.login(
+      authStore.login(
         context: context, 
         email: emailController.text.trim(), 
         password: passwordController.text.trim(),
       );
       {{else if (and flags.isNoneState flags.usesFlutterHooks)}}
-      await viewModel.login(
+      viewModel.login(
         context: context, 
         email: emailController.text.trim(), 
         password: passwordController.text.trim(),
