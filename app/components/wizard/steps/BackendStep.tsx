@@ -18,7 +18,7 @@ export function BackendStep() {
             backend: defaultBackendConfig(provider),
         }
 
-        if (provider === "customRest") {
+        if (provider === "custom") {
             if (!config.misc.usesDio && !config.misc.usesHttp) {
                 updates.misc = {
                     ...config.misc,
@@ -62,25 +62,32 @@ export function BackendStep() {
                         <SelectContent className="bg-background/90 backdrop-blur-xl border-border/50">
                             {backendOptions.map((option) => (
                                 <SelectItem key={option.value} value={option.value}>
-                                    <div className="flex items-center justify-between w-full">
-                                        <span>{option.label}</span>
-                                        <button
-                                            type="button"
-                                            onPointerDown={(e) => {
-                                                e.preventDefault()
-                                                e.stopPropagation()
-                                                setSelectedItem(option.value)
-                                            }}
-                                            onClick={(e) => {
-                                                e.preventDefault()
-                                                e.stopPropagation()
-                                                setSelectedItem(option.value)
-                                            }}
-                                            className="p-1 -mr-1 rounded-full hover:bg-primary/20 text-muted-foreground hover:text-primary transition-colors focus:outline-hidden [&_svg]:pointer-events-auto z-10 cursor-pointer"
-                                            title="View details"
-                                        >
-                                            <HugeiconsIcon icon={InformationCircleIcon} size={16} />
-                                        </button>
+                                    <div className="flex items-center justify-between w-full pr-6">
+                                        <div className="flex flex-col py-0.5">
+                                            <span className="font-semibold">{option.label}</span>
+                                            {backend.provider !== option.value && (
+                                                <span className="text-[10px] text-muted-foreground font-normal line-clamp-1">{option.description}</span>
+                                            )}
+                                        </div>
+                                        {backend.provider !== option.value && (
+                                            <button
+                                                type="button"
+                                                onPointerDown={(e) => {
+                                                    e.preventDefault()
+                                                    e.stopPropagation()
+                                                    setSelectedItem(option.value)
+                                                }}
+                                                onClick={(e) => {
+                                                    e.preventDefault()
+                                                    e.stopPropagation()
+                                                    setSelectedItem(option.value)
+                                                }}
+                                                className="p-1 -mr-2 rounded-full hover:bg-primary/20 text-muted-foreground hover:text-primary transition-colors focus:outline-hidden [&_svg]:pointer-events-auto z-10 cursor-pointer"
+                                                title="View details"
+                                            >
+                                                <HugeiconsIcon icon={InformationCircleIcon} size={16} />
+                                            </button>
+                                        )}
                                     </div>
                                 </SelectItem>
                             ))}
@@ -93,41 +100,49 @@ export function BackendStep() {
                         <div className="grid gap-4 md:grid-cols-2">
                             <ToggleRow
                                 label="Email auth"
+                                infoKey="firebase_auth_email"
                                 checked={(backend as any).options.authEmail}
                                 onCheckedChange={(value) => toggleOption("authEmail", value)}
                             />
                             <ToggleRow
                                 label="Google auth"
+                                infoKey="firebase_auth_google"
                                 checked={(backend as any).options.authGoogle}
                                 onCheckedChange={(value) => toggleOption("authGoogle", value)}
                             />
                             <ToggleRow
                                 label="Phone auth"
+                                infoKey="firebase_auth_phone"
                                 checked={(backend as any).options.authPhone}
                                 onCheckedChange={(value) => toggleOption("authPhone", value)}
                             />
                             <ToggleRow
                                 label="Firestore"
+                                infoKey="firebase_firestore"
                                 checked={(backend as any).options.firestore}
                                 onCheckedChange={(value) => toggleOption("firestore", value)}
                             />
                             <ToggleRow
                                 label="Realtime DB"
+                                infoKey="firebase_realtime_db"
                                 checked={(backend as any).options.realtimeDb}
                                 onCheckedChange={(value) => toggleOption("realtimeDb", value)}
                             />
                             <ToggleRow
                                 label="Storage"
+                                infoKey="firebase_storage"
                                 checked={(backend as any).options.storage}
                                 onCheckedChange={(value) => toggleOption("storage", value)}
                             />
                             <ToggleRow
                                 label="Analytics"
+                                infoKey="firebase_analytics"
                                 checked={(backend as any).options.analytics}
                                 onCheckedChange={(value) => toggleOption("analytics", value)}
                             />
                             <ToggleRow
                                 label="Crashlytics"
+                                infoKey="firebase_crashlytics"
                                 checked={(backend as any).options.crashlytics}
                                 onCheckedChange={(value) => toggleOption("crashlytics", value)}
                             />
@@ -138,16 +153,19 @@ export function BackendStep() {
                         <div className="grid gap-4 md:grid-cols-3">
                             <ToggleRow
                                 label="Auth"
+                                infoKey="supabase_auth"
                                 checked={(backend as any).options.auth}
                                 onCheckedChange={(value) => toggleOption("auth", value)}
                             />
                             <ToggleRow
                                 label="Database"
+                                infoKey="supabase_database"
                                 checked={(backend as any).options.database}
                                 onCheckedChange={(value) => toggleOption("database", value)}
                             />
                             <ToggleRow
                                 label="Edge functions"
+                                infoKey="supabase_edge_functions"
                                 checked={(backend as any).options.edgeFunctions}
                                 onCheckedChange={(value) => toggleOption("edgeFunctions", value)}
                             />
@@ -158,25 +176,28 @@ export function BackendStep() {
                         <div className="grid gap-4 md:grid-cols-3">
                             <ToggleRow
                                 label="Auth"
+                                infoKey="appwrite_auth"
                                 checked={(backend as any).options.auth}
                                 onCheckedChange={(value) => toggleOption("auth", value)}
                             />
                             <ToggleRow
                                 label="Database"
+                                infoKey="appwrite_database"
                                 checked={(backend as any).options.database}
                                 onCheckedChange={(value) => toggleOption("database", value)}
                             />
                             <ToggleRow
                                 label="Storage"
+                                infoKey="appwrite_storage"
                                 checked={(backend as any).options.storage}
                                 onCheckedChange={(value) => toggleOption("storage", value)}
                             />
                         </div>
                     )}
 
-                    {backend.provider === "customRest" && (
+                    {backend.provider === "custom" && (
                         <div className="space-y-2 group">
-                            <Label htmlFor="baseUrl" className="transition-colors group-focus-within:text-primary">Base URL</Label>
+                            <Label htmlFor="baseUrl" className="transition-colors group-focus-within:text-primary">Base URL (Local/Remote)</Label>
                             <Input
                                 id="baseUrl"
                                 placeholder="https://api.example.com"
