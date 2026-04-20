@@ -222,8 +222,8 @@ class SignupScreen extends {{#if (and flags.isRiverpod flags.usesFlutterHooks)}}
                         obscureText: {{#if flags.usesFlutterHooks}}obscurePassword.value{{else}}obscurePassword{{/if}},
                         prefixIcon: const Icon({{#if flags.usesIconsaxPlus}}IconsaxPlusBold.lock{{else}}Icons.lock_outline{{/if}}),
                         suffixIcon: IconButton(
-                          icon: Icon({{#if flags.usesFlutterHooks}}obscurePassword.value ? Icons.visibility_off : Icons.visibility{{else}}Icons.visibility{{/if}}),
-                          onPressed: () => {{#if flags.usesFlutterHooks}}obscurePassword.value = !obscurePassword.value{{else}}null{{/if}},
+                          icon: {{#if flags.usesFlutterHooks}}Icon(obscurePassword.value ? Icons.visibility_off : Icons.visibility){{else}}const Icon(Icons.visibility){{/if}},
+                          onPressed: () {{#if flags.usesFlutterHooks}}=> obscurePassword.value = !obscurePassword.value{{else}}{}{{/if}},
                         ),
                          validator: (v) {
                           if (AppUtils.isBlank(v)) {
@@ -243,8 +243,8 @@ class SignupScreen extends {{#if (and flags.isRiverpod flags.usesFlutterHooks)}}
                         obscureText: {{#if flags.usesFlutterHooks}}obscureConfirmPassword.value{{else}}obscureConfirmPassword{{/if}},
                         prefixIcon: const Icon({{#if flags.usesIconsaxPlus}}IconsaxPlusBold.lock{{else}}Icons.lock_outline{{/if}}),
                         suffixIcon: IconButton(
-                          icon: Icon({{#if flags.usesFlutterHooks}}obscureConfirmPassword.value ? Icons.visibility_off : Icons.visibility{{else}}Icons.visibility{{/if}}),
-                          onPressed: () => {{#if flags.usesFlutterHooks}}obscureConfirmPassword.value = !obscureConfirmPassword.value{{else}}null{{/if}},
+                          icon: {{#if flags.usesFlutterHooks}}Icon(obscureConfirmPassword.value ? Icons.visibility_off : Icons.visibility){{else}}const Icon(Icons.visibility){{/if}},
+                          onPressed: () {{#if flags.usesFlutterHooks}}=> obscureConfirmPassword.value = !obscureConfirmPassword.value{{else}}{}{{/if}},
                         ),
                         validator: (v) {
                           if (AppUtils.isBlank(v)) {

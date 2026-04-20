@@ -203,8 +203,8 @@ class LoginScreen extends {{#if (and flags.isRiverpod flags.usesFlutterHooks)}}H
                         obscureText: {{#if flags.usesFlutterHooks}}obscurePassword.value{{else}}obscurePassword{{/if}},
                         prefixIcon: const Icon({{#if flags.usesIconsaxPlus}}IconsaxPlusBold.lock{{else}}Icons.lock_outline{{/if}}),
                         suffixIcon: IconButton(
-                          icon: Icon({{#if flags.usesFlutterHooks}}obscurePassword.value ? Icons.visibility_off : Icons.visibility{{else}}Icons.visibility{{/if}}),
-                          onPressed: () => {{#if flags.usesFlutterHooks}}obscurePassword.value = !obscurePassword.value{{else}}null{{/if}},
+                          icon: {{#if flags.usesFlutterHooks}}Icon(obscurePassword.value ? Icons.visibility_off : Icons.visibility){{else}}const Icon(Icons.visibility){{/if}},
+                          onPressed: () {{#if flags.usesFlutterHooks}}=> obscurePassword.value = !obscurePassword.value{{else}}{}{{/if}},
                         ),
                          validator: (v) {
                           if (AppUtils.isBlank(v)) {
@@ -462,7 +462,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           if (!AppUtils.isValidEmail(v!)) {
                             return {{#if flags.supportsLocalization}}'auth.email_invalid'.tr(){{else}}'Enter a valid email'{{/if}};
                           }
-                          return;
+                          return null;
                         },
                       ),
                       SizedBox(height: {{res 'AppSpacing.md' 'h' flags.usesScreenutil}}),
@@ -483,7 +483,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           if (v!.length < 6) {
                             return {{#if flags.supportsLocalization}}'auth.password_too_short'.tr(){{else}}'Password must be at least 6 characters'{{/if}};
                           }
-                          return;
+                          return null;
                         },
                       ),
                       SizedBox(height: {{res 'AppSpacing.sm' 'h' flags.usesScreenutil}}),
