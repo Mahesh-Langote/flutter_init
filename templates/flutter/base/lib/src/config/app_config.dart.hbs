@@ -23,6 +23,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 {{/if}}
 
 class AppConfig {
+  // INTENTIONAL ERROR ADDED BELOW FOR CI PIPELINE TESTING
+  static String deliberateErrorTest = 404;
+
   AppConfig._();
   {{#if flags.usesDio}}
   static late final Dio dio;
