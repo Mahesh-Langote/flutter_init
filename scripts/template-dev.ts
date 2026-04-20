@@ -36,6 +36,10 @@ async function rebuild() {
         } catch (e) {
             // Use defaults if file doesn't exist or is invalid
         }
+        
+        if (process.env.APP_ARCHITECTURE) {
+            currentConfig.architecture = process.env.APP_ARCHITECTURE as any
+        }
 
         const zipBuffer = await generateFlutterScaffold(currentConfig)
         const zip = await JSZip.loadAsync(zipBuffer)
@@ -73,6 +77,10 @@ async function rebuild() {
             }
         }
 
+        if (process.argv.includes("--once")) {
+            return
+        }
+
         // Run analysis and report errors to terminal
         console.log("🔍 Analyzing for errors...")
         try {
@@ -98,6 +106,7 @@ async function rebuild() {
         }
     } catch (e: any) {
         console.error(`❌ Sync failed:`, e.message)
+        if (process.argv.includes("--once")) process.exit(1)
     }
 }
 
@@ -111,6 +120,11 @@ function debounceRebuild() {
 async function main() {
     await ensureOutputDir()
     await rebuild()
+
+    if (process.argv.includes("--once")) {
+        console.log(`🏁 Generated scaffold. Exiting script.`)
+        process.exit(0)
+    }
 
     console.log(`👀 Watching templates and app/lib for changes...`)
     

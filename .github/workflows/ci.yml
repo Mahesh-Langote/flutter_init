@@ -1,0 +1,121 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  analyze_generated_code:
+    name: Generate & Analyze (${{ matrix.architecture }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        architecture: [clean, mvvm, feature-first]
+        # app_type: [todo, ecommerce, chat, fintech] # Uncomment when App Types feature is merged
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install Node Dependencies
+        run: bun install
+
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Run Generator
+        env:
+          APP_ARCHITECTURE: ${{ matrix.architecture }}
+        run: bun run scripts/template-dev.ts --once
+
+      - name: Run Dart Analyze
+        working-directory: dev_out
+        run: dart analyze . --fatal-infos --fatal-warnings
+
+      - name: Upload dev_out Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev_out-${{ matrix.architecture }}
+          path: dev_out/
+          retention-days: 7
+
+      - name: Store Analysis Result
+        if: always()
+        run: |
+          echo "${{ matrix.architecture }}:${{ job.status }}" > result-${{ matrix.architecture }}.txt
+
+      - name: Upload Result Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: result-${{ matrix.architecture }}
+          path: result-${{ matrix.architecture }}.txt
+          retention-days: 1
+
+  post_comment:
+    name: Post Results Comment
+    needs: [analyze_generated_code]
+    if: always() && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: result-*
+          merge-multiple: true
+
+      - name: Publish Summary as PR Comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const files = fs.readdirSync('.').filter(fn => fn.startsWith('result-'));
+            
+            if (files.length === 0) {
+              console.log('No result files found.');
+              return;
+            }
+            
+            let summary = '### 🚀 CI Code Generation & Analysis Status\n\n';
+            summary += '| Architecture | Result |\n';
+            summary += '|-------------|---------|\n';
+            let allPassed = true;
+            
+            for (const file of files) {
+              const content = fs.readFileSync(file, 'utf8').trim();
+              const [arch, status] = content.split(':');
+              const icon = (status && status.toLowerCase() === 'success') ? '✅ Passed' : '❌ Failed';
+              summary += `| \`${arch}\` | ${icon} |\n`;
+              if (status && status.toLowerCase() !== 'success') {
+                allPassed = false;
+              }
+            }
+            
+            summary += `\n**Overall Outcome:** ${allPassed ? '✅ All checks completed successfully.' : '❌ Some checks failed! Please review the artifacts for details.'}`;
+            
+            try {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: summary
+              });
+              console.log('Successfully posted comment.');
+            } catch (err) {
+              console.error('Failed to post comment. Ensure the GITHUB_TOKEN has pull-requests:write permission.', err);
+            }
